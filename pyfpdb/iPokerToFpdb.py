@@ -141,7 +141,7 @@ class iPoker(HandHistoryConverter):
     re_Identify = re.compile(u'<game\sgamecode=')
     re_SplitHands = re.compile(r'</game>')
     re_TailSplitHands = re.compile(r'(</game>)')
-    re_GameInfo = re.compile(ur"""
+    re_GameInfo = re.compile(r"""
             <gametype>(?P<GAME>((?P<CATEGORY>(5|7)\sCard\sStud(\sHi\-Lo)?|Holdem|Omaha(\sHi\-Lo)?)\s(?P<LIMIT>NL|SL|L|LZ|PL|БЛ|LP|No\slimit|Pot\slimit|Limit))|LH\s(?P<LSB>[%(NUM)s]+)/(?P<LBB>[%(NUM)s]+).+?)
             (\s(%(LS)s)?(?P<SB>[%(NUM)s]+)/(%(LS)s)?(?P<BB>[%(NUM)s]+))?(\sAnte\s(%(LS)s)?(?P<ANTE>[%(NUM)s]+))?</gametype>\s+?
             <tablename>(?P<TABLE>.+)?</tablename>\s+?
@@ -434,7 +434,7 @@ class iPoker(HandHistoryConverter):
         for a in m:
             if a.group('ATYPE') == '2':
                 blinds[int(a.group('ACT'))] = a.groupdict()
-        for b in sorted(blinds.iterkeys()):
+        for b in sorted(blinds.keys()):
             type = 'big blind'
             blind = blinds[b]
             if not hand.gametype['bb']:
@@ -515,7 +515,7 @@ class iPoker(HandHistoryConverter):
         actions = {}
         for a in m:
             actions[int(a.group('ACT'))] = a.groupdict()
-        for a in sorted(actions.iterkeys()):
+        for a in sorted(actions.keys()):
             action = actions[a]
             atype = action['ATYPE']
             player = action['PNAME']

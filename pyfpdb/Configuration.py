@@ -51,7 +51,6 @@ else:
     winpaths_appdata = False
 
 import logging, logging.config
-import ConfigParser
 
 # config version is used to flag a warning at runtime if the users config is
 #  out of date.
@@ -291,12 +290,12 @@ class Layout:
 
         self.location = []
         self.hh_seats = []
-        self.location = map(lambda x: None, range(self.max+1)) # fill array with max seats+1 empty entries
+        self.location = list(map(lambda x: None, range(self.max+1))) # fill array with max seats+1 empty entries
         # hh_seats is used to map the seat numbers specified in hand history files (and stored in db) onto 
         #   the contiguous integerss, 1 to self.max, used to index hud stat_windows (and aw seat_windows) for display
         #   For most sites these numbers are the same, but some sites (e.g. iPoker) omit seat numbers in hand histories
         #   for tables smaller than 10-max.   
-        self.hh_seats= map(lambda x: None, range(self.max+1)) # fill array with max seats+1 empty entries
+        self.hh_seats= list(map(lambda x: None, range(self.max+1))) # fill array with max seats+1 empty entries
 
         for location_node in node.getElementsByTagName('location'):
             hud_seat = location_node.getAttribute('seat')
@@ -1363,7 +1362,7 @@ class Config:
 
     def getDefaultSite(self):
         "Returns first enabled site or None"
-        for site_name,site in self.supported_sites.iteritems():
+        for site_name,site in self.supported_sites.items():
             if site.enabled:
                 return site_name
         return None

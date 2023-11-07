@@ -14,26 +14,27 @@
 #You should have received a copy of the GNU Affero General Public License
 #along with this program. If not, see <http://www.gnu.org/licenses/>.
 #In the "official" distribution you can find the license in agpl-3.0.txt.
+from __future__ import print_function
 import L10n
 _ = L10n.init_translation()
 
 import os
 import sys
 import re
-import Queue
+import queue
 
 if os.name == 'nt':
     import win32api
     import win32con
 
-print "Python " + sys.version[0:3] + '...'
+print("Python " + sys.version[0:3] + '...')
 
 import codecs
 import traceback
 import Options
 import string
 from functools import partial
-cl_options = string.join(sys.argv[1:])
+cl_options = str(" ").join(sys.argv[1:])
 (options, argv) = Options.fpdb_options()
 
 import logging
@@ -76,7 +77,7 @@ import GuiHandViewer
 try:
     import GuiStove
 except:
-    print _("GuiStove not found. If you want to use it please install pypoker-eval.")
+    print(_("GuiStove not found. If you want to use it please install pypoker-eval."))
 import SQL
 import Database
 import Configuration
@@ -533,7 +534,7 @@ class fpdb(QMainWindow):
                 self.release_global_lock()
             else:
                 self.release_global_lock()
-                print _('User cancelled recreating tables')
+                print(_('User cancelled recreating tables'))
         else:
             self.warning_box(_("Cannot open Database Maintenance window because other windows have been opened. Re-start fpdb to use this option."))
 
@@ -575,11 +576,11 @@ class fpdb(QMainWindow):
 
             response = self.dia_confirm.exec_()
             if response:
-                print _(" Rebuilding HUD Cache ... ")
+                print(_(" Rebuilding HUD Cache ... "))
 
                 self.db.rebuild_cache(self.h_start_date.date().toString("yyyy-MM-dd"), self.start_date.date().toString("yyyy-MM-dd"))
             else:
-                print _('User cancelled rebuilding hud cache')
+                print(_('User cancelled rebuilding hud cache'))
 
             self.release_global_lock()
         else:
@@ -597,16 +598,16 @@ class fpdb(QMainWindow):
 
             response = self.dia_confirm.exec_()
             if response == QMessageBox.Yes:
-                print _(" Rebuilding Indexes ... ")
+                print(_(" Rebuilding Indexes ... "))
                 self.db.rebuild_indexes()
 
-                print _(" Cleaning Database ... ")
+                print(_(" Cleaning Database ... "))
                 self.db.vacuumDB()
 
-                print _(" Analyzing Database ... ")
+                print(_(" Analyzing Database ... "))
                 self.db.analyzeDB()
             else:
-                print _('User cancelled rebuilding db indexes')
+                print(_('User cancelled rebuilding db indexes'))
 
             self.release_global_lock()
         else:
@@ -776,7 +777,7 @@ class fpdb(QMainWindow):
                         # thread has ended so remove from list:
                         del self.threads[i]
                         break
-        except Queue.Empty:
+        except queue.Empty:
             # no close messages on queue, do nothing
             pass
 
@@ -983,7 +984,7 @@ class fpdb(QMainWindow):
         #FIXME  get two "quitting normally" messages, following the addition of the self.window.destroy() call
         #       ... because self.window.destroy() leads to self.destroy() which calls this!
         if not self.quitting:
-            print _("Quitting normally")
+            print(_("Quitting normally"))
             self.quitting = True
         # TODO: check if current settings differ from profile, if so offer to save or abort
 
@@ -1006,7 +1007,7 @@ class fpdb(QMainWindow):
     def release_global_lock(self):
         self.lock.release()
         self.lockTakenBy = None
-        print _("Global lock released.")
+        print(_("Global lock released."))
 
     def tab_auto_import(self, widget, data=None):
         """opens the auto import tab"""
@@ -1118,7 +1119,7 @@ You can find the full license texts in agpl-3.0.txt, gpl-2.0.txt, gpl-3.0.txt an
         self.quitting = False
         self.visible = False
         self.threads = []     # objects used by tabs - no need for threads, gtk handles it
-        self.closeq = Queue.Queue(20)  # used to signal ending of a thread (only logviewer for now)
+        self.closeq = queue.Queue(20)  # used to signal ending of a thread (only logviewer for now)
 
         if options.initialRun:
             self.display_config_created_dialogue = True
@@ -1301,7 +1302,7 @@ You can find the full license texts in agpl-3.0.txt, gpl-2.0.txt, gpl-3.0.txt an
         for site in self.config.supported_sites:    # get site names from config file
             try:
                 self.config.get_site_id(site)                     # and check against list from db
-            except KeyError, exc:
+            except KeyError as exc:
                 log.warning("site %s missing from db" % site)
                 dia = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_WARNING, buttons=(gtk.BUTTONS_OK), message_format=_("Unknown Site"))
                 diastring = _("Warning:") +" " + _("Unable to find site '%s'") % site

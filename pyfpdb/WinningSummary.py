@@ -53,9 +53,9 @@ class WinningSummary(TourneySummary):
         'Regular': 'Normal'
     }
     
-    re_Identify = re.compile(ur'<link\sid="ctl00_CalendarTheme"')
+    re_Identify = re.compile(r'<link\sid="ctl00_CalendarTheme"')
     
-    re_HTMLPlayer = re.compile(ur"Player\sDetails:\s%(PLYR)s</a>" % substitutions, re.IGNORECASE)
+    re_HTMLPlayer = re.compile(r"Player\sDetails:\s%(PLYR)s</a>" % substitutions, re.IGNORECASE)
                         
     re_HTMLTourneyInfo = re.compile(
         r'<td>(?P<TOURNO>[0-9]+)</td>' \

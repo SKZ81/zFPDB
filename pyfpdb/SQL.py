@@ -9220,7 +9220,7 @@ class Sql:
 
         # If using sqlite, use the ? placeholder instead of %s
         if db_server == 'sqlite':
-            for k, q in self.query.iteritems():
+            for k, q in self.query.items():
                 self.query[k] = re.sub('%s', '?', q)
 
 if __name__ == "__main__":

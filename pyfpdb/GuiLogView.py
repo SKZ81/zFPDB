@@ -18,7 +18,7 @@
 import L10n
 _ = L10n.get_translation()
 
-import Queue
+# import queue
 
 from PyQt5.QtGui import (QStandardItem, QStandardItemModel)
 from PyQt5.QtWidgets import (QApplication, QDialog, QPushButton, QHBoxLayout, QRadioButton,
