@@ -22,9 +22,8 @@ _ = L10n.get_translation()
 #    Standard Library modules
 
 import os  # todo: remove this once import_dir is in fpdb_import
-from time import time, sleep, clock
+from time import time, sleep
 import datetime
-import Queue
 import shutil
 import re
 
@@ -91,10 +90,8 @@ class Importer:
         self.database = Database.Database(self.config, sql = self.sql)
         self.writerdbs = []
         self.settings.setdefault("threads", 1) # value set by GuiBulkImport
-        for i in xrange(self.settings['threads']):
+        for i in range(self.settings['threads']):
             self.writerdbs.append( Database.Database(self.config, sql = self.sql) )
-
-        clock() # init clock in windows
 
     #Set functions
     def setMode(self, value):
@@ -118,7 +115,7 @@ class Importer:
     def setThreads(self, value):
         self.settings['threads'] = value
         if self.settings["threads"] > len(self.writerdbs):
-            for i in xrange(self.settings['threads'] - len(self.writerdbs)):
+            for i in range(self.settings['threads'] - len(self.writerdbs)):
                 self.writerdbs.append( Database.Database(self.config, sql = self.sql) )
 
     def setDropIndexes(self, value):

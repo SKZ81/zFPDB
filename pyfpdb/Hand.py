@@ -24,7 +24,6 @@ _ = L10n.get_translation()
 import sys
 from decimal_wrapper import Decimal
 import datetime
-from string import upper
 import pprint
 
 import logging
@@ -1157,11 +1156,11 @@ class HoldemOmahaHand(Hand):
                 if len(self.holecards[street][player][1])==1: continue
                 for i in 0,1:
                     hcs[i] = self.holecards[street][player][1][i]
-                    hcs[i] = upper(hcs[i][0:1])+hcs[i][1:2]
+                    hcs[i] = hcs[i][0:1].upper()+hcs[i][1:2]
                 try:
-                    for i in xrange(2, holeNo):
+                    for i in range(2, holeNo):
                         hcs[i] = self.holecards[street][player][1][i]
-                        hcs[i] = upper(hcs[i][0:1])+hcs[i][1:2]
+                        hcs[i] = hcs[i][0:1].upper()+hcs[i][1:2]
                 except IndexError:
                     log.debug("Why did we get an indexerror?")
 
@@ -1879,7 +1878,7 @@ class Pot(object):
             return ret;
         ret += " Main pot %s%.2f" % (self.sym, self.pots[0][0])
 
-        return ret + ''.join([ (" Side pot %s%.2f." % (self.sym, self.pots[x][0]) ) for x in xrange(1, len(self.pots)) ])
+        return ret + ''.join([ (" Side pot %s%.2f." % (self.sym, self.pots[x][0]) ) for x in range(1, len(self.pots)) ])
         
 def hand_factory(hand_id, config, db_connection):
     # a factory function to discover the base type of the hand

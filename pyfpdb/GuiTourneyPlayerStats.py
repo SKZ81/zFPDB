@@ -311,7 +311,7 @@ class GuiTourneyPlayerStats(QSplitter):
             col.set_sort_order(gtk.SORT_ASCENDING)
         self.liststore[grid].set_sort_column_id(n, col.get_sort_order())
         self.liststore[grid].set_sort_func(n, self.sortnums, (n,grid))
-        for i in xrange(len(self.listcols[grid])):
+        for i in range(len(self.listcols[grid])):
             self.listcols[grid][i].set_sort_indicator(False)
         self.listcols[grid][n].set_sort_indicator(True)
         # use this   listcols[col].set_sort_indicator(True)

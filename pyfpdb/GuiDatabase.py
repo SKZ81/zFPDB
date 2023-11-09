@@ -22,7 +22,6 @@ _ = L10n.get_translation()
 import os
 import sys
 import traceback
-import Queue
 import re
 
 import logging
@@ -227,7 +226,7 @@ class GuiDatabase:
 
     def setDefaultDB(self, row):
         print("set new defaultdb:", row, self.liststore[row][self.MODEL_NAME])
-        for r in xrange(len(self.liststore)):
+        for r in range(len(self.liststore)):
             if r == row:
                 self.liststore[r][self.MODEL_DFLTIC] = gtk.STOCK_APPLY
                 default = "True"
@@ -301,7 +300,7 @@ class GuiDatabase:
             self.liststore.set_sort_column_id(n, col.get_sort_order())
             #self.liststore.set_sort_func(n, self.sortnums, (n,grid))
             log.info('sortcols len(listcols)='+str(len(self.listcols)))
-            for i in xrange(len(self.listcols)):
+            for i in range(len(self.listcols)):
                 log.info('sortcols i='+str(i))
                 self.listcols[i].set_sort_indicator(False)
             self.listcols[n].set_sort_indicator(True)

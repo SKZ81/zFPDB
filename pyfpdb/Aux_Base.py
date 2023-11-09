@@ -285,7 +285,7 @@ class Aux_Seats(Aux_Window):
 
     def adj_seats(self):
         # determine how to adjust seating arrangements, if a "preferred seat" is set in the hud layout configuration
-        #  Need range here, not xrange -> need the actual list
+        #  Need range here, not range -> need the actual list
     
         adj = range(0, self.hud.max + 1) # default seat adjustments = no adjustment
         
@@ -316,7 +316,7 @@ class Aux_Seats(Aux_Window):
             log.error(_("Error finding hero seat."))
             return adj
                 
-        for i in xrange(0, self.hud.max + 1):
+        for i in range(0, self.hud.max + 1):
             j = actual_seat + i
             if j > self.hud.max:
                 j = j - self.hud.max

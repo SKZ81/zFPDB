@@ -323,7 +323,7 @@ winnings    (int) the money the player ended the tourney with (can be 0, or -1 i
         wb = xlrd.open_workbook(filenameXLS)
         sh = wb.sheet_by_index(0)
         summaryTexts, rows, header, keys, entries = [], [], None, None, {}
-        for rownum in xrange(sh.nrows):
+        for rownum in range(sh.nrows):
             if rownum==0:
                 header = sh.row_values(rownum)[0]
             elif tourNoField in sh.row_values(rownum):

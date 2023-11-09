@@ -909,7 +909,7 @@ class Database:
             maxtimes = 5
             pause = 1
             ok = False
-            for i in xrange(maxtimes):
+            for i in range(maxtimes):
                 try:
                     ret = self.connection.commit()
                     #log.debug(_("commit finished ok, i = ")+str(i))

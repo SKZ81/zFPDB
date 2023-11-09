@@ -38,7 +38,7 @@ from PyQt5.QtWidgets import (QApplication, QFrame, QMenu,
                              QProgressDialog, QScrollArea, QSplitter,
                              QTableView, QVBoxLayout)
 
-from StringIO import StringIO
+from io import StringIO
 
 import GuiReplayer
 
@@ -122,7 +122,7 @@ class GuiHandViewer(QSplitter):
 
         self.view.doubleClicked.connect(self.row_activated)
         self.view.contextMenuEvent = self.contextMenu
-        self.filterModel.rowsInserted.connect(lambda index, start, end: [self.view.resizeRowToContents(r) for r in xrange(start, end + 1)])
+        self.filterModel.rowsInserted.connect(lambda index, start, end: [self.view.resizeRowToContents(r) for r in range(start, end + 1)])
         self.filterModel.filterAcceptsRow = lambda row, sourceParent: self.is_row_in_card_filter(row)
 
         self.view.resizeColumnsToContents()

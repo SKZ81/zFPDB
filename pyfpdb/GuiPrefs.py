@@ -96,7 +96,7 @@ class GuiPrefs(QDialog):
             name = ""
             item = QTreeWidgetItem(parent, [setting, value])
             if node.hasAttributes():
-                for i in xrange(node.attributes.length):
+                for i in range(node.attributes.length):
                     localName,updated = self.rewriteText( node.attributes.item(i).localName )
                     attritem = QTreeWidgetItem(item, [localName, node.attributes.item(i).value])
                     attritem.setData(1, Qt.UserRole, node.attributes.item(i))

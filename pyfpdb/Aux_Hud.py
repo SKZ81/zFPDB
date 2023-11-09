@@ -160,8 +160,8 @@ class Simple_Stat_Window(Aux_Base.Seat_Window):
         self.setLayout(self.grid)
         self.stat_box = [ [None]*self.aw.ncols for i in range(self.aw.nrows) ]
 
-        for r in xrange(self.aw.nrows):
-            for c in xrange(self.aw.ncols):
+        for r in range(self.aw.nrows):
+            for c in range(self.aw.ncols):
                 self.stat_box[r][c] = self.aw.aw_class_stat(self.aw.stats[r][c],
                     seat = self.seat,
                     popup = self.aw.popups[r][c],
@@ -174,8 +174,8 @@ class Simple_Stat_Window(Aux_Base.Seat_Window):
         if i == "common": return
         player_id = self.aw.get_id_from_seat(i)
         if player_id is None: return
-        for r in xrange(self.aw.nrows):
-            for c in xrange(self.aw.ncols):
+        for r in range(self.aw.nrows):
+            for c in range(self.aw.ncols):
                 self.stat_box[r][c].update(player_id, self.aw.hud.stat_dict)
 
 
