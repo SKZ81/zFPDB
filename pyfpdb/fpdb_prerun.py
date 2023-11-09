@@ -124,7 +124,7 @@ class ChooseLanguage:
 #  two messages because L10n not guaranteed to be available
 #
 
-from Tkinter import *
+from tkinter import *
 
 try:
     module = __import__("sys")
@@ -152,9 +152,9 @@ _ = L10n.get_translation()
 import Configuration
 config = Configuration.Config()
 
-if config.python_version not in("2.6", "2.7"):
-    failure(_("Python 2.6-2.7 not found, please install python 2.6 or 2.7 for fpdb."))
-    
+if config.python_version[0] != "3":
+    failure(_("Python 3 not found, please install python 3 for fpdb."))
+
 #
 # next, check for individual modules existing
 #
