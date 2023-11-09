@@ -493,7 +493,7 @@ class Bovada(HandHistoryConverter):
             if self.Lim_Blinds.get(BB) != None:
                 hand.gametype['sb'] = self.Lim_Blinds.get(BB)[0]
         elif hand.gametype['bb'] == None and hand.gametype['sb'] != None:
-            for k, v in self.Lim_Blinds.iteritems():
+            for k, v in self.Lim_Blinds.items():
                 if hand.gametype['sb'] == v[0]:
                     hand.gametype['bb'] = v[1]
         if hand.gametype['sb'] == None or hand.gametype['bb'] == None:
@@ -516,7 +516,7 @@ class Bovada(HandHistoryConverter):
                         newcards = found.group('NEWCARDS').split(' ')
                         hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
                     
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_ShowdownAction.finditer(hand.streets[street])
             foundDict = None

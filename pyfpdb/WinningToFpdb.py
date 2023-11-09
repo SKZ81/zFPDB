@@ -472,7 +472,7 @@ class Winning(HandHistoryConverter):
                 if hand.hero:
                     hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
 
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             players = {}
@@ -482,7 +482,7 @@ class Winning(HandHistoryConverter):
                     players[player] = []
                 players[player].append(found.group('CARD').replace("10", "T"))
             
-            for player, cards in players.iteritems():
+            for player, cards in players.items():
                 if street == 'THIRD': # hero in stud game
                     hand.dealt.add(player) # need this for stud??
                     if len(cards)==3:

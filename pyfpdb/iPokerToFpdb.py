@@ -485,7 +485,7 @@ class iPoker(HandHistoryConverter):
                     hand.addHoleCards(street, player, closed=cards, shown=True, mucked=False, dealt=True)
         
         
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             for found in m:
@@ -553,7 +553,7 @@ class iPoker(HandHistoryConverter):
 
     def readCollectPot(self, hand):
         hand.setUncalledBets(True)
-        for pname, pot in self.playerWinnings.iteritems():
+        for pname, pot in self.playerWinnings.items():
             hand.addCollectPot(player=pname, pot=self.clearMoneyString(pot))
 
     def readShownCards(self, hand):

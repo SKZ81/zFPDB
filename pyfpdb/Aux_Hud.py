@@ -120,7 +120,7 @@ class Simple_HUD(Aux_Base.Aux_Seats):
         """Save new layout back to the aux element in the config file."""
 
         new_locs = {}
-        for (i, pos) in self.positions.iteritems():
+        for (i, pos) in self.positions.items():
             if i != 'common':
                 new_locs[self.adj[int(i)]] = ((pos[0]), (pos[1]))
             else:

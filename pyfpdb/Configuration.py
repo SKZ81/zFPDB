@@ -1205,7 +1205,7 @@ class Config:
         if width: layout_node.setAttribute("width", str(width))
         if height: layout_node.setAttribute("height", str(height))
         
-        for (i, pos) in locations.iteritems():
+        for (i, pos) in locations.items():
             location_node = self.get_location_node(layout_node, i)
             location_node.setAttribute("x", str( locations[i][0] ))
             location_node.setAttribute("y", str( locations[i][1] ))
@@ -1737,7 +1737,7 @@ if __name__== "__main__":
     
     print("\n-----------  HUD PARAMS -----------")
     print("hud params =")
-    for hud_param, value in c.get_hud_ui_parameters().iteritems():
+    for hud_param, value in c.get_hud_ui_parameters().items():
         print(" %s = %s" % (hud_param, value))
         
     print("\n-----------  STARTUP PATH -----------")

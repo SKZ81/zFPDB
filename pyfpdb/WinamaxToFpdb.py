@@ -448,7 +448,7 @@ class Winamax(HandHistoryConverter):
                         hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
                         log.debug(_("Hero cards %s: %s") % (hand.hero, newcards))
                     
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL', 'BLINDSANTES'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             for found in m:

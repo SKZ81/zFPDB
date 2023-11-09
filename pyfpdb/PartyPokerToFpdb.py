@@ -656,7 +656,7 @@ class PartyPoker(HandHistoryConverter):
                     newcards = renderCards(found.group('NEWCARDS'))
                     hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
                     
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             for found in m:

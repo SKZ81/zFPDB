@@ -266,7 +266,7 @@ class DerivedStats():
         num_collectees, i = len(hand.collectees), 0
         even_split = hand.totalpot / num_collectees if num_collectees > 0 else 0
         unraked = [c for c in hand.collectees.values() if even_split == c]
-        for player, winnings in hand.collectees.iteritems():
+        for player, winnings in hand.collectees.items():
             collectee_stats = self.handsplayers.get(player)
             collectee_stats['winnings'] = int(100 * winnings)
             # Splits evenly on split pots and gives remainder to first player
@@ -296,7 +296,7 @@ class DerivedStats():
             i+=1
         
         contributed, i = [], 0
-        for player, money_committed in hand.pot.committed.iteritems():
+        for player, money_committed in hand.pot.committed.items():
             committed_player_stats = self.handsplayers.get(player)
             paid = (100 * money_committed) + (100*hand.pot.common[player])
             committed_player_stats['common'] = int(100 * hand.pot.common[player])
@@ -392,7 +392,7 @@ class DerivedStats():
                 holecards[pname]['eq'] = 0
                 holecards[pname]['committed'] = 0
                 holeplayers.append(pname)
-                for street, board in boards.iteritems():
+                for street, board in boards.items():
                     streetId = streets[street]
                     if streetId > 0:
                         streetSeen = hp['street%sSeen' % str(streetId)]
@@ -638,7 +638,7 @@ class DerivedStats():
                                     playersPots[pname][1].append(data)
                                     self.handsplayers[pname]['rake'] = 0
         
-            for p, (total, info) in playersPots.iteritems():
+            for p, (total, info) in playersPots.items():
                 if hand.collectees.get(p) and info:
                     potFound[p][1] = hand.collectees.get(p)
                     for item in info:
@@ -992,7 +992,7 @@ class DerivedStats():
                     player_stats['street%dCBChance' % (i+1)] = True
                     player_stats['street%dCBDone' % (i+1)] = self.betStreet(hand.actions, hand.actionStreets[i+2], name)
                     if player_stats['street%dCBDone' % (i+1)]:
-                        for pname, folds in self.foldTofirstsBetOrRaiser(hand.actions, street, name).iteritems():
+                        for pname, folds in self.foldTofirstsBetOrRaiser(hand.actions, street, name).items():
                             #print "DEBUG:", hand.handid, pname.encode('utf8'), street, folds, '--', name, 'lastbet on ', hand.actionStreets[i+1]
                             self.handsplayers[pname]['foldToStreet%sCBChance' % (i+1)] = True
                             self.handsplayers[pname]['foldToStreet%sCBDone' % (i+1)] = folds
@@ -1158,7 +1158,7 @@ class DerivedStats():
             if action[0] in seen: continue
             if action[0] not in pstacks: continue
             seen[action[0]] = 1
-            oppstacks = [v for (k,v) in pstacks.iteritems() if k != action[0]]
+            oppstacks = [v for (k,v) in pstacks.items() if k != action[0]]
             if oppstacks:
                 if pstacks[action[0]] > max(oppstacks):
                     self.handsplayers[action[0]]['effStack'] = max(oppstacks)

@@ -206,7 +206,7 @@ class PokerStarsSummary(TourneySummary):
             raise FpdbParseError
         info.update(m.groupdict())
         mg = {}
-        for k, j in info.iteritems():
+        for k, j in info.items():
             if self.re_XLSTourneyInfo.get(k)!=None:
                 m1 = self.re_XLSTourneyInfo[k].search(j)
                 if m1: mg.update(m1.groupdict())

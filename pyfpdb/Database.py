@@ -2397,7 +2397,7 @@ class Database:
         if self.tbulk:
             q_update_sessions  = self.sql.query['updateTourneysSessions'].replace('%s', self.sql.query['placeholder'])
             c = self.get_cursor()
-            for t, sid in self.tbulk.iteritems():
+            for t, sid in self.tbulk.items():
                 c.execute(q_update_sessions,  (sid, t))
                 self.commit()
 
@@ -2409,7 +2409,7 @@ class Database:
             pp.pprint(pdata)
 
         hpbulk = self.hpbulk
-        for p, pvalue in pdata.iteritems():
+        for p, pvalue in pdata.items():
             # Add (hid, pids[p]) + all the values in pvalue at the
             # keys in HANDS_PLAYERS_KEYS to hpbulk.
             bulk_data = [pvalue[key] for key in HANDS_PLAYERS_KEYS]
@@ -2521,7 +2521,7 @@ class Database:
             select_hudcache_tour = select_hudcache_tour.replace('%s', self.sql.query['placeholder'])
             inserts = []
             c = self.get_cursor()
-            for k, item in self.hcbulk.iteritems():
+            for k, item in self.hcbulk.items():
                 
                 if not k[4]:
                     q = select_hudcache_ring
@@ -2571,7 +2571,7 @@ class Database:
             weekStart  = weekdate - timedelta(days=weekdate.weekday())
        
         j, hand = None, {}
-        for p, id in pids.iteritems():
+        for p, id in pids.items():
             if id in heroes:
                 hand['startTime']  = startTime.replace(tzinfo=None)
                 hand['weekStart']  = weekStart
@@ -2712,7 +2712,7 @@ class Database:
                     for h in self.s['bk'][i]['ids']:
                         self.s[h] = {'id': sid, 'wid': wid, 'mid': mid}
                     for m in merge:
-                        for h, n in self.s.iteritems():
+                        for h, n in self.s.items():
                             if h!='bk' and n['id'] == m:
                                 self.s[h] = {'id': sid, 'wid': wid, 'mid': mid}
                         c.execute(update_S_TC,(sid, m))
@@ -2738,7 +2738,7 @@ class Database:
         """Update cached cash sessions. If no record exists, do an insert"""      
         THRESHOLD    = timedelta(seconds=int(self.sessionTimeout * 60))
         if pdata: #gametype['type']=='ring' and 
-            for p, pid in pids.iteritems():
+            for p, pid in pids.items():
                 hp = {}
                 k = (gametypeId, pid)
                 hp['startTime'] = startTime.replace(tzinfo=None)
@@ -2793,7 +2793,7 @@ class Database:
             insert_SC    = self.sql.query['insert_SC'].replace('%s', self.sql.query['placeholder'])
             delete_SC    = self.sql.query['delete_SC'].replace('%s', self.sql.query['placeholder'])
             c = self.get_cursor()
-            for k, sessionplayer in self.sc.iteritems():
+            for k, sessionplayer in self.sc.items():
                 for session in sessionplayer:
                     hid = session['hid']
                     sid = self.s.get(hid)['id']
@@ -2888,7 +2888,7 @@ class Database:
             
             inserts = []
             c = self.get_cursor()
-            for k, tc in self.tc.iteritems():
+            for k, tc in self.tc.items():
                 sc = self.s.get(tc['hid'])
                 tc['startTime'] = tc['startTime'].replace(tzinfo=None)
                 tc['endTime']   = tc['endTime'].replace(tzinfo=None)
@@ -2949,7 +2949,7 @@ class Database:
             insert_M     = self.sql.query['insert_M'].replace('%s', self.sql.query['placeholder'])
             
             dccache, inserts = {}, []
-            for k, l in self.dcbulk.iteritems():
+            for k, l in self.dcbulk.items():
                 sc = self.s.get(k[0])
                 if sc != None:                    
                     garbageWeekMonths = (sc['wid'], sc['mid']) in self.wmnew or (sc['wid'], sc['mid']) in self.wmold
@@ -2965,7 +2965,7 @@ class Database:
                             dccache[n] = l
 
             c = self.get_cursor()
-            for k, item in dccache.iteritems():
+            for k, item in dccache.items():
                 if k[3]:
                     q = select_cardscache_tour
                     row = list(k)
@@ -3020,7 +3020,7 @@ class Database:
             insert_M     = self.sql.query['insert_M'].replace('%s', self.sql.query['placeholder'])
                 
             pccache, inserts = {}, []
-            for k, l in self.pcbulk.iteritems():
+            for k, l in self.pcbulk.items():
                 sc = self.s.get(k[0])
                 if sc != None:
                     garbageWeekMonths = (sc['wid'], sc['mid']) in self.wmnew or (sc['wid'], sc['mid']) in self.wmold
@@ -3036,7 +3036,7 @@ class Database:
                             pccache[n] = l
             
             c = self.get_cursor()
-            for k, item in pccache.iteritems():
+            for k, item in pccache.items():
                 if k[3]:
                     q = select_positionscache_tour
                     row = list(k)
@@ -3102,7 +3102,7 @@ class Database:
                                                          # () or (1,) style
             for site in self.config.get_supported_sites():
                 hero = self.config.supported_sites[site].screen_name
-                for n, v in pids.iteritems():
+                for n, v in pids.items():
                     if n == hero and sitename == site:
                         hero_ids.append(v)
                         
@@ -3608,7 +3608,7 @@ class Database:
         updateDb = False
         cursor = self.get_cursor()
         q = self.sql.query['updateTourneysPlayerBounties'].replace('%s', self.sql.query['placeholder'])
-        for player, tourneysPlayersId in hand.tourneysPlayersIds.iteritems():
+        for player, tourneysPlayersId in hand.tourneysPlayersIds.items():
             if player in hand.koCounts:
                 cursor.execute(q, (
                     hand.koCounts[player],
@@ -3625,7 +3625,7 @@ class Database:
                             (summary.tourneyId,))
         result=cursor.fetchall()
         if result: tplayers += [i for i in result]
-        for player, entries in summary.players.iteritems():
+        for player, entries in summary.players.items():
             playerId = summary.dbid_pids[player]
             for entryIdx in range(len(entries)):
                 entryId = entries[entryIdx]

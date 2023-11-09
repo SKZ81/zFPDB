@@ -140,7 +140,7 @@ class MergeSummary(TourneySummary):
                 handsDict[tourNo] = [handText]
             else:
                 hands.append(handText)
-        for tourNo, hands in handsDict.iteritems():
+        for tourNo, hands in handsDict.items():
             self.resetInfo()
             self.db.resetBulkCache()
             m = self.re_GameTypeHH.search(hands[0])

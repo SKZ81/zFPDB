@@ -92,7 +92,7 @@ class Aux_Window(object):
         #  Some sites (e.g. iPoker) miss out some seat numbers if max is <10,
         #  e.g. iPoker 6-max uses seats 1,3,5,6,8,10 NOT 1,2,3,4,5,6
         seat = self.hud.layout.hh_seats[seat]
-        for id, dict in self.hud.stat_dict.iteritems():
+        for id, dict in self.hud.stat_dict.items():
             if seat == dict['seat']:
                 return id
         return None
@@ -250,7 +250,7 @@ class Aux_Seats(Aux_Window):
 #   Methods likely to be useful for mucked card windows (or similar) only
     def hide(self):
         """Hide the seat windows."""
-        for (i, w) in self.m_windows.iteritems():
+        for (i, w) in self.m_windows.items():
             if w is not None: w.hide()
         self.displayed = False
 

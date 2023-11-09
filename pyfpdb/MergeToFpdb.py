@@ -516,7 +516,7 @@ or None if we fail to get the info """
                     hand.gametype['sb'] = str(int(Decimal(hand.gametype['bb']))/2)
             hand.sb = hand.gametype['sb']
             hand.bb = hand.gametype['bb']
-            for player, blindtype in allinBlinds.iteritems():
+            for player, blindtype in allinBlinds.items():
                 if blindtype=='big blind':
                     self.adjustMergeTourneyStack(hand, player, hand.bb)
                     hand.addBlind(player, 'big blind', hand.bb)

@@ -179,7 +179,7 @@ ring = copy.deepcopy(sites)
 tour = copy.deepcopy(sites)
 summ = copy.deepcopy(sites)
 
-for idx, f in idsite.filelist.iteritems():
+for idx, f in idsite.filelist.items():
     if f.gametype != False:
         a = f.gametype['category']
         b = f.gametype['limitType']

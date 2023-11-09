@@ -205,7 +205,7 @@ class Stud_cards:
 
     def update_gui(self, new_hand_id):
         self.clear()
-        for c, cards in self.parent.hud.cards.iteritems():
+        for c, cards in self.parent.hud.cards.items():
             if c == 'common': continue
             self.grid_contents[(1, c - 1)].setText(self.get_screen_name(c))
             for i in ((0, cards[0]), (1, cards[1]), (2, cards[2]), (3, cards[3]), 
@@ -325,7 +325,7 @@ class Flop_Mucked(Aux_Base.Aux_Seats, QObject):
     def save_layout(self, *args):
         """Save new common position back to the layout element in the config file."""
         new_locs = {}
-        for (i, pos) in self.positions.iteritems():
+        for (i, pos) in self.positions.items():
             if i == 'common':
                 new_locs[i] = ((pos[0]), (pos[1]))
             else:

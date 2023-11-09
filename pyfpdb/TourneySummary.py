@@ -337,7 +337,7 @@ winnings    (int) the money the player ended the tourney with (can be 0, or -1 i
                 if entries.get(data[tourNoField])==None:
                     entries[data[tourNoField]] = []
                 entries[data[tourNoField]].append(data)
-        for k, item in entries.iteritems():
+        for k, item in entries.items():
             summaryTexts.append(item)
         return summaryTexts
 

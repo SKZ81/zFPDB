@@ -549,7 +549,7 @@ class PokerStars(HandHistoryConverter):
                     newcards = found.group('NEWCARDS').split(' ')
                     hand.addHoleCards(street, hand.hero, closed=newcards, shown=False, mucked=False, dealt=True)
 
-        for street, text in hand.streets.iteritems():
+        for street, text in hand.streets.items():
             if not text or street in ('PREFLOP', 'DEAL'): continue  # already done these
             m = self.re_HeroCards.finditer(hand.streets[street])
             for found in m:
@@ -617,7 +617,7 @@ class PokerStars(HandHistoryConverter):
             m = self.re_WinningRankOne.search(hand.handText)
             if m: winner = m.group('PNAME')
             
-            for pname, amount in koAmounts.iteritems():
+            for pname, amount in koAmounts.items():
                 if pname == winner:
                     end = (amount + hand.endBounty[pname])
                     hand.koCounts[pname] = (amount + hand.endBounty[pname]) / Decimal(hand.koBounty)
