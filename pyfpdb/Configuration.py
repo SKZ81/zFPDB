@@ -82,12 +82,12 @@ else:
     INSTALL_METHOD = "source"
 
 if INSTALL_METHOD == "exe" or INSTALL_METHOD == "app":
-    FPDB_ROOT_PATH = os.path.dirname(unicode(sys.executable, sys.getfilesystemencoding())) # should be exe path to \fpdbroot\pyfpdb
+    FPDB_ROOT_PATH = os.path.dirname(sys.executable) # should be exe path to \fpdbroot\pyfpdb
 elif sys.path[0] == "": # we are probably running directly (>>>import Configuration)
     temp = os.getcwdu() # should be ./pyfpdb
     FPDB_ROOT_PATH = os.path.join(temp, os.pardir)   # go up one level (to fpdbroot)
 else: # all other cases
-    FPDB_ROOT_PATH = os.path.dirname(unicode(sys.path[0], sys.getfilesystemencoding()))  # should be source path to /fpdbroot
+    FPDB_ROOT_PATH = os.path.dirname(sys.path[0])  # should be source path to /fpdbroot
 
 sysPlatform = platform.system()  #Linux, Windows, Darwin
 if sysPlatform[0:5] == 'Linux':
@@ -649,7 +649,7 @@ class General(dict):
         #                e.g. user could set to 4.0 for day to start at 4am local time
         # [ HH_bulk_path was here - now moved to import section ]
         for (name, value) in node.attributes.items():
-            log.debug(unicode(_("config.general: adding %s = %s"), "utf8") % (name,value))
+            log.debug(_("config.general: adding %s = %s") % (name,value))
             self[name] = value
         
         try:
@@ -810,7 +810,7 @@ class Config:
             os.mkdir(CONFIG_PATH)
 
         if custom_log_dir and os.path.exists(custom_log_dir):
-            self.dir_log = unicode(custom_log_dir, "utf8")
+            self.dir_log = custom_log_dir
         else:
             self.dir_log = os.path.join(CONFIG_PATH, u'log')
         self.log_file = os.path.join(self.dir_log, u'fpdb-log.txt')
@@ -852,7 +852,7 @@ class Config:
         added,n = 1,0  # use n to prevent infinite loop if add_missing_elements() fails somehow
         while added > 0 and n < 2:
             n = n + 1
-            log.info(unicode(_("Reading configuration file %s"), "utf8") % file)
+            log.info(_("Reading configuration file %s") % file)
             #print (("\n"+_("Reading configuration file %s")+"\n") % file)
             try:
                 doc = xml.dom.minidom.parse(file)
@@ -1385,10 +1385,10 @@ class Config:
         try:    hui['card_wd']        = int(self.ui.card_wd)
         except: hui['card_wd']        = 30
         
-        try:    hui['deck_type']      = unicode(self.ui.deck_type)
+        try:    hui['deck_type']      = str(self.ui.deck_type)
         except: hui['deck_type']        = u'colour'
         
-        try:    hui['card_back']      = unicode(self.ui.card_back)
+        try:    hui['card_back']      = str(self.ui.card_back)
         except: hui['card_back']        = u'back04'
                 
         try:    hui['stat_range']        = self.ui.stat_range
