@@ -30,7 +30,7 @@ from PyQt5.QtWidgets import (QFrame, QScrollArea, QSplitter, QVBoxLayout)
 import Database
 import Filters
 import Charset
-
+from GuiTourneyViewer import GuiTourneyViewer
 try:
     calluse = not 'matplotlib' in sys.modules
     import matplotlib
@@ -48,57 +48,37 @@ except ImportError as inst:
     print(_("""This is of no consequence for other parts of the program, e.g. import and HUD are NOT affected by this problem."""))
     print("ImportError: %s" % inst.args)
 
-class GuiTourneyGraphViewer(QSplitter):
+class GuiTourneyGraphViewer(GuiTourneyViewer):
+    def __init__(self, config, db, querylist, parent, debug=True):
+        GuiTourneyViewer.__init__(self, config, db, querylist, parent, debug)
 
-    def __init__(self, querylist, config, parent, debug=True):
-        """Constructor for GraphViewer"""
-        QSplitter.__init__(self, parent)
-        self.sql = querylist
-        self.conf = config
-        self.debug = debug
-        self.parent = parent
-        self.db = Database.Database(self.conf, sql=self.sql)
-
-
-        filters_display = { "Heroes"    : True,
-                            "Sites"     : True,
-                            "Games"     : False,
-                            "Currencies": True,
-                            "Limits"    : False,
-                            "LimitSep"  : False,
-                            "LimitType" : False,
-                            "Type"      : False,
-                            "UseType"   : 'tour',
-                            "Seats"     : False,
-                            "SeatSep"   : False,
-                            "Dates"     : True,
-                            "Groups"    : False,
-                            "Button1"   : True,
-                            "Button2"   : True
-                          }
-
-        self.filters = Filters.Filters(self.db, display = filters_display)
         self.filters.registerButton1Name(_("Refresh Graph"))
         self.filters.registerButton1Callback(self.generateGraph)
         self.filters.registerButton2Name(_("Export to File"))
         self.filters.registerButton2Callback(self.exportGraph)
 
-        scroll = QScrollArea()
-        scroll.setWidget(self.filters)
-        self.addWidget(scroll)
-
-        frame = QFrame()
-        self.graphBox = QVBoxLayout()
-        frame.setLayout(self.graphBox)
-        self.addWidget(frame)
-        self.setStretchFactor(0, 0)
-        self.setStretchFactor(1, 1)
-
         self.fig = None
         #self.exportButton.set_sensitive(False)
         self.canvas = None
 
-        self.db.rollback()
+    def get_filters_display(self):
+        return {
+                "Heroes"    : True,
+                "Sites"     : True,
+                "Games"     : False,
+                "Currencies": True,
+                "Limits"    : False,
+                "LimitSep"  : False,
+                "LimitType" : False,
+                "Type"      : False,
+                "UseType"   : 'tour',
+                "Seats"     : False,
+                "SeatSep"   : False,
+                "Dates"     : True,
+                "Groups"    : False,
+                "Button1"   : True,
+                "Button2"   : True
+                }
 
     def clearGraphData(self):
         try:
