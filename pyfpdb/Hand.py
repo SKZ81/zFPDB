@@ -468,7 +468,7 @@ class Hand(object):
         # However a startTime is needed for a valid output by writeHand:
         self.startTime = datetime.datetime.strptime("1970-01-01 12:00:00", "%Y-%m-%d %H:%M:%S")
 
-        cards = map(Card.valueSuitFromCard, [res['boardcard1'], res['boardcard2'], res['boardcard3'], res['boardcard4'], res['boardcard5']])
+        cards = list(map(Card.valueSuitFromCard, [res['boardcard1'], res['boardcard2'], res['boardcard3'], res['boardcard4'], res['boardcard5']]))
         if cards[0]:
             self.setCommunityCards('FLOP', cards[0:3])
         if cards[3]:
@@ -690,7 +690,7 @@ class Hand(object):
                 self.bets['BLINDSANTES'][player].append(sb)
                 self.pot.addCommonMoney(player, sb)
                 
-            street = 'BLAH'
+            street = 'BLAH' # excuse me ?
 
             if self.gametype['base'] == 'hold':
                 street = 'PREFLOP'

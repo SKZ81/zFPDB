@@ -269,7 +269,7 @@ class Filters(QWidget):
         return self.siteid
 
     def getHeroes(self):
-        return dict([(site, unicode(self.leHeroes[site].text())) for site in self.leHeroes])
+        return dict([(site, self.leHeroes[site].text()) for site in self.leHeroes])
 
     def getGraphOps(self):
         return [g for g in self.cbGraphops if self.cbGraphops[g].isChecked()]

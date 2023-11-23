@@ -856,7 +856,8 @@ class DerivedStats():
         for i in range(5): self.hands['street%dRaises' % i] = 0
 
         for (i, street) in enumerate(hand.actionStreets[1:]):
-            self.hands['street%dRaises' % i] = len(filter( lambda action: action[1] in ('raises','bets'), hand.actions[street]))
+            betted_hands = filter( lambda action: action[1] in ('raises','bets'), hand.actions[street])
+            self.hands['street%dRaises' % i] = sum(1 for _ in betted_hands)
 
     def calcSteals(self, hand):
         """Fills raiseFirstInChance|raisedFirstIn, fold(Bb|Sb)ToSteal(Chance|)

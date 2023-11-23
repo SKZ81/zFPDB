@@ -137,18 +137,18 @@ class GuiReplayer(QWidget):
         communityLeft = int(self.tableImage.width() / 2 - 2.5 * self.cardwidth)
         communityTop = int(self.tableImage.height() / 2 - 1.75 * self.cardheight)
 
-        convertx = lambda x: int(x * self.tableImage.width() * 0.8) + self.tableImage.width() / 2
-        converty = lambda y: int(y * self.tableImage.height() * 0.6) + self.tableImage.height() / 2
+        convertx = lambda x: int(x * self.tableImage.width() * 0.8) + self.tableImage.width() // 2
+        converty = lambda y: int(y * self.tableImage.height() * 0.6) + self.tableImage.height() // 2
 
         for player in state.players.values():
             playerx = convertx(player.x)
             playery = converty(player.y)
-            painter.drawImage(QPoint(playerx - self.playerBackdrop.width() / 2, playery - 3), self.playerBackdrop)
+            painter.drawImage(QPoint(playerx - self.playerBackdrop.width() // 2, playery - 3), self.playerBackdrop)
             if player.action=="folds":
                 painter.setPen(QColor("grey"))
             else:
                 painter.setPen(QColor("white"))
-                x = playerx - self.cardwidth * len(player.holecards) / 2
+                x = playerx - self.cardwidth * len(player.holecards) // 2
                 self.renderCards(painter, player.holecards,
                                  x, playery - self.cardheight)
 
@@ -174,8 +174,8 @@ class GuiReplayer(QWidget):
         painter.setPen(QColor("white"))
 
         if state.pot > 0:
-            painter.drawText(QRect(self.tableImage.width() / 2 - 100,
-                                   self.tableImage.height() / 2 - 20,
+            painter.drawText(QRect(self.tableImage.width() // 2 - 100,
+                                   self.tableImage.height() // 2 - 20,
                                    200,
                                    40),
                              Qt.AlignCenter,
@@ -348,7 +348,10 @@ class TableState:
 
         self.players = {}
 
-        for seat, name, chips, pos in hand.players:
+        for x in hand.players:
+            print(str(x))
+            #TODO : why is there a new unpacked value here ?
+        for seat, name, chips, pos, _ in hand.players:
             self.players[name] = Player(hand, name, chips, seat)
 
     def startPhase(self, phase):

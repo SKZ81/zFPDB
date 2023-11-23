@@ -97,7 +97,7 @@ class GuiPositionalStats:
         self.main_hbox = gtk.HPaned()
 
         self.stats_frame = gtk.ScrolledWindow(hadjustment=None, vadjustment=None)
-        self.stats_frame.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.stats_frame.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
         self.stats_frame.show()
 
         self.stats_vbox = gtk.VBox(False, 0)

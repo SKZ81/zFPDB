@@ -23,7 +23,6 @@ import L10n
 _ = L10n.get_translation()
 
 import sys
-import exceptions
 
 from HandHistoryConverter import *
 from decimal_wrapper import Decimal
@@ -124,11 +123,13 @@ class Winamax(HandHistoryConverter):
 # Seat 1: some_player (5€)
 # Seat 2: some_other_player21 (6.33€)
 
-    re_PlayerInfo        = re.compile(u'Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.*)\s\((%(LS)s)?(?P<CASH>[.0-9]+)(%(LS)s)?\)' % substitutions)
+    re_PlayerInfo        = re.compile(u'Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.*)\s\((%(LS)s)?(?P<CASH>[.0-9]+)(%(LS)s)?(,\s(%(LS)s)?(?P<PL_BOUNTY>[.0-9]+)(%(LS)s)?\sbounty)?\)' % substitutions)
     re_PlayerInfoSummary = re.compile(u'Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.+?)\s' % substitutions)
 
     def compilePlayerRegexs(self, hand):
         players = set([player[1] for player in hand.players])
+        print("compilePlayerRegexs: hand plrs " + str(players))
+        print("compilePlayerRegexs: compiled plrs " + str(self.compiledPlayers))
         if not players <= self.compiledPlayers: # x <= y means 'x is subset of y'
             # we need to recompile the player regexs.
 # TODO: should probably rename re_HeroCards and corresponding method,
@@ -155,6 +156,8 @@ class Winamax(HandHistoryConverter):
 
             self.re_CollectPot = re.compile('\s*(?P<PNAME>.*)\scollected\s(%(CUR)s)?(?P<POT>[\.\d]+)(%(CUR)s)?.*' % subst)
             self.re_ShownCards = re.compile("^Seat (?P<SEAT>[0-9]+): %(PLYR)s (\((small blind|big blind|button)\) )?showed \[(?P<CARDS>.*)\].+? with (?P<STRING>.*)" % subst, re.MULTILINE)
+        else:
+            log.error(_("WinamaxToFpdb could not compile parsing regexp."))
 
     def readSupportedGames(self):
         return [
@@ -399,11 +402,12 @@ class Winamax(HandHistoryConverter):
             hand.setCommunityCards(street, m.group('CARDS').split(' '))
 
     def readBlinds(self, hand):
+        print("readBlind: " + hand.handText)
         if not self.re_DenySB.search(hand.handText):
             try:
                 m = self.re_PostSB.search(hand.handText)
                 hand.addBlind(m.group('PNAME'), 'small blind', m.group('SB'))
-            except exceptions.AttributeError: # no small blind
+            except AttributeError: # no small blind
                 log.warning( _("No small blinds found.")+str(sys.exc_info()) )
             #hand.addBlind(None, None, None)
         for a in self.re_PostBB.finditer(hand.handText):

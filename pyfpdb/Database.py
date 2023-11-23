@@ -1301,7 +1301,7 @@ class Database:
     def get_player_id(self, config, siteName, playerName):
         c = self.connection.cursor()
         siteNameUtf = Charset.to_utf8(siteName)
-        playerNameUtf = unicode(playerName)
+        playerNameUtf = playerName
         #print "db.get_player_id siteName",siteName,"playerName",playerName
         c.execute(self.sql.query['get_player_id'], (playerNameUtf, siteNameUtf))
         row = c.fetchone()

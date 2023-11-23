@@ -158,10 +158,10 @@ class Importer:
     def addFileToList(self, fpdbfile):
         """FPDBFile"""
         file = os.path.splitext(os.path.basename(fpdbfile.path))[0]
-        try: #TODO: this is a dirty hack. GBI needs it, GAI fails with it.
-            file = unicode(file, "utf8", "replace")
-        except TypeError:
-            pass
+        # try: #TODO: this is a dirty hack. GBI needs it, GAI fails with it.
+        #     file = unicode(file, "utf8", "replace")
+        # except TypeError:
+        #     pass
         fpdbfile.fileId = self.database.get_id(file)
         if not fpdbfile.fileId:
             now = datetime.datetime.utcnow()
@@ -251,7 +251,7 @@ class Importer:
         if 'dropHudCache' in self.settings and self.settings['dropHudCache'] == 'auto':
             self.settings['dropHudCache'] = self.calculate_auto2(self.database, 25.0, 500.0)    # returns "drop"/"don't drop"
 
-        (totstored, totdups, totpartial, totskipped, toterrors) = self.importFiles(None)
+        (totstored, totdups, totpartial, totskipped, toterrors) = self.importFiles()
 
         # Tidying up after import
         #if 'dropHudCache' in self.settings and self.settings['dropHudCache'] == 'drop':
@@ -270,7 +270,7 @@ class Importer:
         self.database.cleanUpWeeksMonths()
         self.database.resetClean()
 
-    def importFiles(self, q):
+    def importFiles(self):
         """"Read filenames in self.filelist and pass to despatcher."""
 
         totstored = 0
@@ -417,7 +417,7 @@ class Importer:
 
         # Load filter, process file, pass returned filename to import_fpdb_file
         log.info(_("Converting %s") % fpdbfile.path)
-            
+
         filter_name = fpdbfile.site.filter_name
         mod = __import__(fpdbfile.site.hhc_fname)
         obj = getattr(mod, filter_name, None)
@@ -433,7 +433,7 @@ class Importer:
             hhc.setAutoPop(self.mode=='auto')
             hhc.start()
             
-            self.pos_in_file[file] = hhc.getLastCharacterRead()
+            self.pos_in_file[fpdbfile.path] = hhc.getLastCharacterRead()
             #Tally the results
             partial  = getattr(hhc, 'numPartial')
             skipped  = getattr(hhc, 'numSkipped')
@@ -487,7 +487,7 @@ class Importer:
                         for line in formatted_lines:
                             error_trace += line
                         tmp = hand.handText[0:200]
-                        log.error(_("Importer._import_hh_file: '%r' Fatal error: '%r'") % (file, error_trace))
+                        log.error(_("Importer._import_hh_file: '%r' Fatal error: '%r'") % (fpdbfile.path, error_trace))
                         log.error(_("'%r'") % tmp)
                         if (doinsert and ihands): backtrack = True
                     if backtrack: #If last hand in the file is a duplicate this will backtrack and insert the new hand records

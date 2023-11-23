@@ -211,7 +211,7 @@ class fpdb(QMainWindow):
 
     def dia_about(self, widget, data=None):
         QMessageBox.about(self, "Free Poker Database (FPDB)",
-                          "\n".join([VERSION,
+                          "\n".join([str(VERSION),
                                      "Copyright 2008-2013. See contributors.txt for details",
                                      _("You are free to change, and distribute original or changed versions of fpdb within the rules set out by the license"),
                                      "http://fpdb.sourceforge.net/",
@@ -1309,11 +1309,6 @@ You can find the full license texts in agpl-3.0.txt, gpl-2.0.txt, gpl-3.0.txt an
                 dia.format_secondary_text(diastring)
                 dia.run()
                 dia.destroy()
-
-    def main(self):
-        gtk.main()
-        return 0
-
 
 if __name__ == "__main__":
     app = QApplication([])
