@@ -19,6 +19,10 @@ from __future__ import print_function
 import L10n
 _ = L10n.get_translation()
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk as gtk
+
 import os
 import sys
 import traceback
@@ -71,13 +75,13 @@ class GuiDatabase:
             self.action_area = self.dia.action_area
             #gtk.Widget.set_size_request(self.vbox, 700, 400);
 
-            h = gtk.HBox(False, spacing=3)
+            h = gtk.HBox(spacing=3)
             h.show()
-            self.vbox.pack_start(h, padding=3)
+            self.vbox.pack_start(h, False, False, 3)
 
-            vbtn = gtk.VBox(True, spacing=3)
+            vbtn = gtk.VBox(spacing=3)
             vbtn.show()
-            h.pack_start(vbtn, expand=False, fill=False, padding=2)
+            h.pack_start(vbtn, False, False, 2)
 
             # list of databases in self.config.supported_databases:
             self.liststore = gtk.ListStore(str, str, str, str, str
@@ -92,14 +96,14 @@ class GuiDatabase:
             # # The TreeView gets the filter as model
             # self.listview = gtk.TreeView(filter)
             self.listview = gtk.TreeView(model=self.liststore)
-            self.listview.set_grid_lines(gtk.TREE_VIEW_GRID_LINES_NONE)
+            self.listview.set_grid_lines(gtk.TreeViewGridLines.NONE)
             self.listcols = []
             self.changes = False
 
             self.scrolledwindow = gtk.ScrolledWindow()
-            self.scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+            self.scrolledwindow.set_policy(gtk.PolicyType.AUTOMATIC, gtk.PolicyType.AUTOMATIC)
             self.scrolledwindow.add(self.listview)
-            h.pack_start(self.scrolledwindow, expand=True, fill=True, padding=0)
+            h.pack_start(self.scrolledwindow, True, True, 0)
 
             add_button = SideButton(_("Add"), gtk.STOCK_ADD)
             add_button.connect("clicked", self.addDB, None)
@@ -616,22 +620,22 @@ class InfoBox(gtk.Dialog):
 
     def __init__(self, parent, str1):
         # create dialog and add icon and label
-        btns = (gtk.BUTTONS_OK)
+        btns = (gtk.ButtonType.OK)
         btns = None
         # messagedialog puts text in inverse colors if no buttons are displayed??
         #dia = gtk.MessageDialog( parent=self.main_window, flags=gtk.DIALOG_DESTROY_WITH_PARENT
         #                       , type=gtk.MESSAGE_INFO, buttons=(btns), message_format=str1 )
         # so just use Dialog instead
         super(InfoBox,self).__init__( parent=parent
-                                    , flags=gtk.DIALOG_DESTROY_WITH_PARENT
+                                    , flags=gtk.DialogFlags.DESTROY_WITH_PARENT
                                     , title="" ) # , buttons=btns
         
         h = gtk.HBox(False, 2)
         i = gtk.Image()
         i.set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_DIALOG)
         l = gtk.Label(str1)
-        h.pack_start(i, padding=5)
-        h.pack_start(l, padding=5)
+        h.pack_start(i, False, False, padding=5)
+        h.pack_start(l, False, False, padding=5)
         self.vbox.pack_start(h)
         parent.show_all()
         self.show_all()
@@ -662,18 +666,19 @@ class SideButton(gtk.Button):
     # label.set_text('Hide')
 
     def __init__(self, label=None, stock=None, use_underline=True):
-        gtk.stock_add([(stock, label, 0, 0, "")])
+        # gtk.stock_add([(stock, label, 0, 0, "")])
 
-        super(SideButton, self).__init__(label=label, stock=stock, use_underline=True)
+        super(SideButton, self).__init__(label=label, use_underline=True)
+        self.set_from_stock(stock)
         alignment = self.get_children()[0]
         hbox = alignment.get_children()[0]
         image, label = hbox.get_children()
         #label.set_text('Hide')
         hbox.remove(image)
         hbox.remove(label)
-        v = gtk.VBox(False, spacing=3)
-        v.pack_start(image, 3)
-        v.pack_start(label, 3)
+        v = gtk.VBox(homogeneous=False, spacing=3)
+        v.pack_start(image, False, False, 3)
+        v.pack_start(label, False, False, 3)
         alignment.remove(hbox)
         alignment.add(v)
         self.show_all()
@@ -684,20 +689,23 @@ if __name__=="__main__":
 
     config = Configuration.Config()
 
-    win = gtk.Window(gtk.WINDOW_TOPLEVEL)
+    win = gtk.Window(type = gtk.WindowType.TOPLEVEL)
     win.set_title(_("Maintain Databases"))
     win.set_border_width(1)
     win.set_default_size(600, 500)
     win.set_resizable(True)
 
-    dia = gtk.Dialog(_("Maintain Databases"),
-                     win,
-                     gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                     (gtk.STOCK_CLOSE, gtk.RESPONSE_OK))
+    dia = gtk.Dialog(title = _("Maintain Databases"),
+                     parent = win, modal=True, destroy_with_parent=True)
+                     # (gtk.STOCK_CLOSE, gtk.RESPONSE_OK))
+
+    dia.add_button(gtk.STOCK_OK, gtk.ResponseType.OK)
+    dia.add_button(gtk.STOCK_CLOSE, gtk.ResponseType.CLOSE)
+
     dia.set_default_size(500, 500)
     log = GuiDatabase(config, win, dia)
     response = dia.run()
-    if response == gtk.RESPONSE_ACCEPT:
+    if response == gtk.ResponseType.OK:
         pass
     dia.destroy()
 
