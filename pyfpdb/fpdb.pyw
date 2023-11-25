@@ -1302,12 +1302,8 @@ You can find the full license texts in agpl-3.0.txt, gpl-2.0.txt, gpl-3.0.txt an
             try:
                 self.config.get_site_id(site)                     # and check against list from db
             except KeyError as exc:
-                log.warning("site %s missing from db" % site)
-                dia = gtk.MessageDialog(parent=None, flags=0, type=gtk.MESSAGE_WARNING, buttons=(gtk.BUTTONS_OK), message_format=_("Unknown Site"))
-                diastring = _("Warning:") +" " + _("Unable to find site '%s'") % site
-                dia.format_secondary_text(diastring)
-                dia.run()
-                dia.destroy()
+                warnstr = _("Warning:") +" " + _("Site '%s' missing from db.") % site
+                log.warning(warnstr)
 
 if __name__ == "__main__":
     app = QApplication([])

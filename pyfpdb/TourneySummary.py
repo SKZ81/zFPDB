@@ -57,11 +57,13 @@ class TourneySummary(object):
     LCS = {'H':'h', 'D':'d', 'C':'c', 'S':'s'}                                                  # SAL- TO KEEP ??
     SYMBOL = {'USD': '$', 'EUR': u'$', 'T$': '', 'play': ''}
     MS = {'horse' : 'HORSE', '8game' : '8-Game', 'hose'  : 'HOSE', 'ha': 'HA'}
-    SITEIDS = {'Fulltilt':1, 'Full Tilt Poker':1, 'PokerStars':2, 'Everleaf':3, 'Boss':4, 'OnGame':5,
-               'UltimateBet':6, 'Betfair':7, 'Absolute':8, 'PartyPoker':9, 'PacificPoker':10,
-               'Partouche':11, 'Merge':12, 'PKR':13, 'iPoker':14, 'Winamax':15, 'Everest':16,
-               'Cake':17, 'Entraction':18, 'BetOnline':19, 'Microgaming':20, 'Bovada':21, 'Enet':22,
-               'SealsWithClubs': 23, 'WinningPoker': 24}
+    #TODO: remove poker networks (iPoker, OnGame, ...), we should have support only for rooms/sites here
+    SITEIDS = {'PokerStars':1, 'OnGame':2, #OnGame as only Bwin as a room
+                'Betfair':3, 'PartyPoker':4, '888':5, # Pacific poker renamed 888
+               'Partouche':6, 'Merge':7, 'iPoker':8,  # maybe switch to
+               'Winamax':9,
+               'BetOnline':10, 'Microgaming':11, 'Bovada':12,
+               'SealsWithClubs': 13, 'WinningPoker': 14} # networks ?
 
 
     def __init__(self, db, config, siteName, summaryText, in_path='-', builtFrom="HHC", header=""):
