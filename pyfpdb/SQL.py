@@ -6077,7 +6077,8 @@ class Sql:
                         hp.card6,hp.card7,hp.card8,hp.card9,hp.card10,
                         hp.card11,hp.card12,hp.card13,hp.card14,hp.card15,
                         hp.card16,hp.card17,hp.card18,hp.card19,hp.card20,
-                        hp.position
+                        hp.position,
+                        hp.startBounty
                     FROM
                         HandsPlayers as hp,
                         Players as p

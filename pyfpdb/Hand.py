@@ -385,7 +385,7 @@ class Hand(object):
         # Discripter must be set to lowercase as postgres returns all descriptors lower case and SQLight returns them as they are
         res = [dict(line) for line in [zip([ column[0].lower() for column in c.description], row) for row in c.fetchall()]]
         for row in res:
-            self.addPlayer(row['seatno'],row['name'],str(row['chips']), str(row['position']))
+            self.addPlayer(row['seatno'],row['name'],str(row['chips']), str(row['position']), bounty=str(row['startbounty']/100.0) if row['startbounty'] else None)
             cardlist = []
             cardlist.append(Card.valueSuitFromCard(row['card1']))
             cardlist.append(Card.valueSuitFromCard(row['card2']))
@@ -573,7 +573,7 @@ class Hand(object):
         if len(self.players) > 0 and seat in [p[0] for p in self.players]:
             raise FpdbHandPartial("addPlayer: " + _("Can't have 2 players in the same seat!") + ": '%s'" % self.handid)
        
-        log.debug("addPlayer: %s %s (%s)", seat, name, chips)
+        log.debug("addPlayer: %s %s (%s, %s)", seat, name, chips, bounty)
         if chips is not None:
             chips = chips.replace(u',', u'') #some sites have commas
             self.players.append([seat, name, chips, position, bounty])

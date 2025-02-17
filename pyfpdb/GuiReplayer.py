@@ -30,8 +30,8 @@ import Database
 import SQL
 import Deck
 
-from PyQt5.QtCore import (QPoint, QRect, Qt, QTimer)
-from PyQt5.QtGui import (QColor, QImage, QPainter)
+from PyQt5.QtCore import (QPoint, QRect, QRectF, Qt, QTimer)
+from PyQt5.QtGui import (QColor, QImage, QPainter, QPainterPath, QPen)
 from PyQt5.QtWidgets import (QHBoxLayout, QPushButton, QSlider, QVBoxLayout,
                              QWidget)
 
@@ -163,14 +163,32 @@ class GuiReplayer(QWidget):
                 painter.drawText(QRect(playerx - 50, playery + 15, 100, 20), Qt.AlignCenter, player.action)
             else:
                 painter.setPen(QColor("white"))
+
             if player.chips != 0:
                 painter.drawText(QRect(convertx(player.x * .65) - 100,
-                                       converty(player.y * 0.65),
-                                       200,
-                                       20),
-                                 Qt.AlignCenter,
-                                 '%s%.2f' % (self.currency, player.chips))
+                                        converty(player.y * 0.65),
+                                        200,
+                                        20),
+                                    Qt.AlignCenter,
+                                    '%s%.2f' % (self.currency, player.chips))
 
+            if player.bounty:
+                path = QPainterPath()
+                path.addRoundedRect(
+                    QRectF(
+                        playerx -30 + self.playerBackdrop.width() // 2,
+                        playery - 26,
+                        30, 20),
+                    10, 10)
+                pen = QPen(Qt.black, 2)
+                painter.setPen(pen)
+                painter.fillPath(path, Qt.red)
+                painter.drawPath(path)
+                painter.setPen(QColor("white"))
+                painter.drawText(QRect(
+                        playerx - 30 + self.playerBackdrop.width() // 2,
+                        playery - 26, 30, 20),
+                    Qt.AlignCenter, str(player.bounty))
         painter.setPen(QColor("white"))
 
         if state.pot > 0:
@@ -368,8 +386,8 @@ class TableState:
         for x in hand.players:
             print(str(x))
             #TODO : why is there a new unpacked value here ?
-        for seat, name, chips, pos, _ in hand.players:
-            self.players[name] = Player(hand, name, chips, seat)
+        for seat, name, chips, pos, bounty in hand.players:
+            self.players[name] = Player(hand, name, chips, seat, bounty)
 
     def startPhase(self, phase):
         self.street = phase
@@ -455,11 +473,12 @@ class TableState:
             self.players[name].stack += amount
 
 class Player:
-    def __init__(self, hand, name, stack, seat):
+    def __init__(self, hand, name, stack, seat, bounty=None):
         self.stack     = Decimal(stack)
         self.chips     = Decimal(0)
         self.seat      = seat
         self.name      = name
+        self.bounty    = bounty
         self.action    = None
         self.justacted = False
         self.holecards = hand.join_holecards(name, asList=True)

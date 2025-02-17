@@ -234,7 +234,7 @@ class DerivedStats():
                 player_stats['startBounty'] = int(100 * Decimal(player[4]))
                 player_stats['endBounty'] = int(100 * Decimal(player[4]))
             if player_name in hand.endBounty:
-                player_stats['endBounty'] = int(hand.endBounty.get(player_name))
+                player_stats['endBounty'] = int(100 * hand.endBounty.get(player_name))
             if player_name in hand.sitout:
                 player_stats['sitout'] = True
             else:
