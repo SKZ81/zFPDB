@@ -80,11 +80,6 @@ class GuiSessionViewer(QSplitter):
         self.db = Database.Database(self.conf, sql=self.sql)
         self.cursor = self.db.cursor
 
-        settings = {}
-        settings.update(self.conf.get_db_parameters())
-        settings.update(self.conf.get_import_parameters())
-        settings.update(self.conf.get_default_paths())
-
         # text used on screen stored here so that it can be configured
         self.filterText = {'handhead':_('Hand Breakdown for all levels listed above')}
 
