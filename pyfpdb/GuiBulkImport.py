@@ -44,6 +44,43 @@ class GuiBulkImport(QWidget):
     # CONFIGURATION  -  update these as preferred:
     allowThreads = False  # set to True to try out the threads field
 
+    def load_file_clicked(self):
+        stored = None
+        dups = None
+        partial = None
+        skipped = None
+        errs = None
+        ttime = None
+        # Does the lock acquisition need to be more sophisticated for multiple dirs?
+        # (see comment above about what to do if pipe already open)
+        if self.settings['global_lock'].acquire(wait=False, source="GuiBulkImport"):   # returns false immediately if lock not acquired
+            #try:
+                #    get the dir to import from the chooser
+                filename = self.importFile.text()
+                self.importer.setMode('file')
+
+                self.importer.addImportFile(filename)
+                self.importer.setCallHud(False)
+
+                starttime = time()
+
+                (stored, dups, partial, skipped, errs, ttime) = self.importer.runImport()
+
+                ttime = time() - starttime
+                if ttime == 0:
+                    ttime = 1
+
+                completionMessage = _('File import done: Stored: %d, Duplicates: %d, Partial: %d, Skipped: %d, Errors: %d, Time: %s seconds, Stored/second: %.0f')\
+                    % (stored, dups, partial, skipped, errs, ttime, (stored+0.0) / ttime)
+                print(completionMessage)
+                log.info(completionMessage)
+
+                self.importer.clearFileList()
+
+                self.settings['global_lock'].release()
+        else:
+            print(_("bulk import aborted - global lock not available"))
+
     def load_clicked(self):
         stored = None
         dups = None
@@ -101,7 +138,7 @@ class GuiBulkImport(QWidget):
         self.importDir = QLineEdit(self.settings['bulkImport-defaultPath'])
         hbox = QHBoxLayout()
         hbox.addWidget(self.importDir)
-        self.chooseButton = QPushButton('Browse...')
+        self.chooseButton = QPushButton('Browse Dir...')
         self.chooseButton.clicked.connect(self.browseClicked)
         hbox.addWidget(self.chooseButton)
         self.layout().addLayout(hbox)
@@ -109,6 +146,18 @@ class GuiBulkImport(QWidget):
         self.load_button = QPushButton(_('Bulk Import'))
         self.load_button.clicked.connect(self.load_clicked)
         self.layout().addWidget(self.load_button)
+
+        self.importFile = QLineEdit()
+        hbox2 = QHBoxLayout()
+        hbox2.addWidget(self.importFile)
+        self.chooseFileButton = QPushButton('Browse File...')
+        self.chooseFileButton.clicked.connect(self.browseFileClicked)
+        hbox2.addWidget(self.chooseFileButton)
+        self.layout().addLayout(hbox2)
+
+        self.load_file_button = QPushButton(_('File Import'))
+        self.load_file_button.clicked.connect(self.load_file_clicked)
+        self.layout().addWidget(self.load_file_button)
 
 #    see how many hands are in the db and adjust accordingly
         tcursor = self.importer.database.cursor
@@ -124,6 +173,13 @@ class GuiBulkImport(QWidget):
         if newdir:
             self.importDir.setText(newdir)
 
+    def browseFileClicked(self):
+        filename = QFileDialog.getOpenFileName(self, caption=_("Please choose the file that you want to Import"),
+                                            directory=self.importDir.text())[0]
+        if filename:
+            # for filename in filenames:
+            self.importFile.setText(filename)
+
 if __name__ == '__main__':
     config = Configuration.Config()
     settings = {}
@@ -133,9 +189,9 @@ if __name__ == '__main__':
     settings.update(config.get_db_parameters())
     settings.update(config.get_import_parameters())
     settings.update(config.get_default_paths())
-    import interlocks, string
+    import interlocks
     settings['global_lock'] = interlocks.InterProcessLock(name="fpdb_global_lock")
-    settings['cl_options'] = string.join(sys.argv[1:])
+    settings['cl_options'] = " ".join(sys.argv[1:])
 
     from PyQt5.QtWidgets import QApplication, QMainWindow
     app = QApplication([])
