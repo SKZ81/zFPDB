@@ -55,7 +55,6 @@ import interlocks
 import numpy
 numpy_version = numpy.__version__
 import sqlite3
-sqlite3_version = sqlite3.version
 sqlite_version = sqlite3.sqlite_version
 
 import DetectInstalledSites

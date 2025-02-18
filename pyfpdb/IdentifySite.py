@@ -256,16 +256,16 @@ class IdentifySite:
             f.site = Site('PokerTracker', filter, filter_name, summary, obj)
             if m1:
                 f.ftype = "hh"
-                if re.search(u'\*{2}\sGame\sID\s', m1.group()):
+                if re.search(r'\*{2}\sGame\sID\s', m1.group()):
                     f.site.line_delimiter = None
-                    f.site.re_SplitHands = re.compile(u'End\sof\sgame\s\d+')
-                elif re.search(u'\*{2}\sHand\s\#\s', m1.group()):
+                    f.site.re_SplitHands = re.compile(r'End\sof\sgame\s\d+')
+                elif re.search(r'\*{2}\sHand\s\#\s', m1.group()):
                     f.site.line_delimiter = None
-                    f.site.re_SplitHands = re.compile(u'Rake:\s[^\s]+')
-                elif re.search(u'Server\spoker\d+\.ipoker\.com', whole_file[:250]):
+                    f.site.re_SplitHands = re.compile(r'Rake:\s[^\s]+')
+                elif re.search(r'Server\spoker\d+\.ipoker\.com', whole_file[:250]):
                     f.site.line_delimiter = None
                     f.site.spaces = True
-                    f.site.re_SplitHands = re.compile(u'GAME\s\#')
+                    f.site.re_SplitHands = re.compile(r'GAME\s\#')
                 m3 = f.site.re_HeroCards1.search(whole_file[:5000])
                 if m3:
                     f.hero = m3.group('PNAME')
