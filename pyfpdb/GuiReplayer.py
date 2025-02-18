@@ -194,17 +194,30 @@ class GuiReplayer(QWidget):
                 y += 0.5 * self.cardheight
             self.renderCards(painter, state.board[street], x, y)
 
+    def nextHand(self):
+        if self.handidx < len(self.handlist) - 1:
+            self.play_hand(self.handidx + 1)
+
+    def previousHand(self):
+        if self.handidx > 0:
+            self.play_hand(self.handidx - 1)
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Left:
-            self.stateSlider.setValue(max(0, self.stateSlider.value() - 1))
+            if self.stateSlider.value() > 0:
+                self.stateSlider.setValue(self.stateSlider.value() - 1)
+            else:
+                self.previousHand()
         elif event.key() == Qt.Key_Right:
-            self.stateSlider.setValue(min(self.stateSlider.maximum(), self.stateSlider.value() + 1))
+            if self.stateSlider.value() < self.stateSlider.maximum():
+                self.stateSlider.setValue(self.stateSlider.value() + 1)
+            else:
+                self.nextHand()
+
         elif event.key() == Qt.Key_Up:
-            if self.handidx < len(self.handlist) - 1:
-                self.play_hand(self.handidx + 1)
+            self.previousHand()
         elif event.key() == Qt.Key_Down:
-            if self.handidx > 0:
-                self.play_hand(self.handidx - 1)
+            self.nextHand()
         else:
             QWidget.keyPressEvent(self, event)
 
