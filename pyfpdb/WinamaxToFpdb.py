@@ -44,7 +44,6 @@ class Winamax(HandHistoryConverter):
     siteName = "Winamax"
     filetype = "text"
     codepage = ("utf8", "cp1252")
-    siteId   = 15 # Needs to match id entry in Sites database
 
     mixes = { } # Legal mixed games
     sym = {'USD': "\$", 'CAD': "\$", 'T$': "", "EUR": u"\xe2\x82\xac|\u20ac", "GBP": "\xa3", "play": ""}         # ADD Euro, Sterling, etc HERE
@@ -77,16 +76,16 @@ class Winamax(HandHistoryConverter):
     re_Identify = re.compile(u'Winamax\sPoker\s\-\s(CashGame|Tournament\s")')
     re_SplitHands = re.compile(r'\n\n')
 
-
+    siteId = 9 # TODO should be requested in database
 
 # Winamax Poker - CashGame - HandId: #279823-223-1285031451 - Holdem no limit (0.02€/0.05€) - 2010/09/21 03:10:51 UTC
 # Table: 'Charenton-le-Pont' 9-max (real money) Seat #5 is the button
     re_HandInfo = re.compile(u"""
             \s*Winamax\sPoker\s-\s
-            (?P<RING>CashGame)?
+            (?P<RING>CashGame|HOLD-UP|ESCAPE)?
             (?P<TOUR>Tournament\s
-            (?P<TOURNAME>.+)?\s
-            buyIn:\s(?P<BUYIN>(?P<BIAMT>[%(LS)s\d\,.]+)?(\s\+?\s|-)(?P<BIRAKE>[%(LS)s\d\,.]+)?\+?(?P<BOUNTY>[%(LS)s\d\.]+)?\s?(?P<TOUR_ISO>%(LEGAL_ISO)s)?|(?P<FREETICKET>[\sa-zA-Z]+))?\s
+            \"(?P<TOURNAME>)\"\s
+            # buyIn:\s(?P<BUYIN>(?P<BIAMT>[%(LS)s\d\,.]+)((\s\+?\s|-)(?P<BIBOUNTY>[%(LS)s\d\.]+))?(\s\+?\s|-)(?P<BIRAKE>[%(LS)s\d\,.]+)\s+)
             (level:\s(?P<LEVEL>\d+))?
             .*)?
             \s-\sHandId:\s\#(?P<HID1>\d+)-(?P<HID2>\d+)-(?P<HID3>\d+)\s-\s  # REB says: HID3 is the correct hand number
@@ -123,8 +122,7 @@ class Winamax(HandHistoryConverter):
 # Seat 1: some_player (5€)
 # Seat 2: some_other_player21 (6.33€)
 
-    re_PlayerInfo        = re.compile(u'Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.*)\s\((%(LS)s)?(?P<CASH>[.0-9]+)(%(LS)s)?(,\s(%(LS)s)?(?P<PL_BOUNTY>[.0-9]+)(%(LS)s)?\sbounty)?\)' % substitutions)
-    re_PlayerInfoSummary = re.compile(u'Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.+?)\s' % substitutions)
+    re_PlayerInfo        = re.compile(u'Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.*)\s\((%(LS)s)?(?P<PL_STACK>[.0-9]+)(%(LS)s)?(,\s(%(LS)s)?(?P<PL_BOUNTY>[.0-9]+)(%(LS)s)?\sbounty)?\)' % substitutions)
 
     def compilePlayerRegexs(self, hand):
         players = set([player[1] for player in hand.players])
@@ -132,9 +130,6 @@ class Winamax(HandHistoryConverter):
         print("compilePlayerRegexs: compiled plrs " + str(self.compiledPlayers))
         if not players <= self.compiledPlayers: # x <= y means 'x is subset of y'
             # we need to recompile the player regexs.
-# TODO: should probably rename re_HeroCards and corresponding method,
-#    since they are used to find all cards on lines starting with "Dealt to:"
-#    They still identify the hero.
             self.compiledPlayers = players
             #ANTES/BLINDS
             #helander2222 posts blind ($0.25), lopllopl posts blind ($0.50).
@@ -156,30 +151,30 @@ class Winamax(HandHistoryConverter):
 
             self.re_CollectPot = re.compile('\s*(?P<PNAME>.*)\scollected\s(%(CUR)s)?(?P<POT>[\.\d]+)(%(CUR)s)?.*' % subst)
             self.re_ShownCards = re.compile("^Seat (?P<SEAT>[0-9]+): %(PLYR)s (\((small blind|big blind|button)\) )?showed \[(?P<CARDS>.*)\].+? with (?P<STRING>.*)" % subst, re.MULTILINE)
-        else:
-            log.error(_("WinamaxToFpdb could not compile parsing regexp."))
+            log.info(_("WinamaxToFpdb recompiled parsing regexp for new player list."))
 
     def readSupportedGames(self):
+        # NOTE : no diff omaha, etc ?? Is it really useful ?
         return [
                 ["ring", "hold", "fl"],
                 ["ring", "hold", "nl"],
                 ["ring", "hold", "pl"],
 
                 ["ring", "stud", "fl"],
-
-                ["ring", "draw", "fl"],
-                ["ring", "draw", "pl"],
-                ["ring", "draw", "nl"],
+                #
+                # ["ring", "draw", "fl"],
+                # ["ring", "draw", "pl"],
+                # ["ring", "draw", "nl"],
                 
                 ["tour", "hold", "fl"],
                 ["tour", "hold", "nl"],
                 ["tour", "hold", "pl"],   
                              
                 ["tour", "stud", "fl"],
-                
-                ["tour", "draw", "fl"],
-                ["tour", "draw", "pl"],
-                ["tour", "draw", "nl"],
+#
+#                 ["tour", "draw", "fl"],
+#                 ["tour", "draw", "pl"],
+#                 ["tour", "draw", "nl"],
                ]
 
     def determineGameType(self, handText):
@@ -270,63 +265,45 @@ class Winamax(HandHistoryConverter):
                 hand.maxseats = int(info[key])
 
             if key == 'BUYIN':
-                if hand.tourNo!=None:
-                    #print "DEBUG: info['BUYIN']: %s" % info['BUYIN']
-                    #print "DEBUG: info['BIAMT']: %s" % info['BIAMT']
-                    #print "DEBUG: info['BIRAKE']: %s" % info['BIRAKE']
-                    #print "DEBUG: info['BOUNTY']: %s" % info['BOUNTY']
-                    for k in ['BIAMT','BIRAKE']:
+                if hand.tourNo is not None:
+                    for k in ['BIAMT','BIBOUNTY', 'BIRAKE']:
                         if k in info.keys() and info[k]:
                             info[k] = info[k].replace(',','.')
 
-                    if info['FREETICKET'] is not None:
-                        hand.buyin = 0
-                        hand.fee = 0
-                        hand.buyinCurrency = "FREE"
+                    if info[key].find("$")!=-1:
+                        hand.buyinCurrency="USD"
+                    elif info[key].find(u"€")!=-1:
+                        hand.buyinCurrency="EUR"
+                    elif info['MONEY']:
+                        hand.buyinCurrency="EUR"
                     else:
-                        if info[key].find("$")!=-1:
-                            hand.buyinCurrency="USD"
-                        elif info[key].find(u"€")!=-1:
-                            hand.buyinCurrency="EUR"
-                        elif info[key].find("FPP")!=-1:
-                            hand.buyinCurrency="WIFP"
-                        elif info[key].find("Free")!=-1:
-                            hand.buyinCurrency="WIFP"
-                        elif info['MONEY']:
-                            hand.buyinCurrency="EUR"
-                        else:
-                            hand.buyinCurrency="play"
+                        hand.buyinCurrency="play"
 
-                        if info['BIAMT'] is not None:
-                            info['BIAMT'] = info['BIAMT'].strip(u'$€FPP')
-                        else:
-                            info['BIAMT'] = 0
+                    if info['BIAMT'] is not None:
+                        info['BIAMT'] = info['BIAMT'].strip(u'$€FPP')
+                    else:
+                        info['BIAMT'] = 0
 
-                        if hand.buyinCurrency!="WIFP":
-                            if info['BOUNTY'] != None:
-                                # There is a bounty, Which means we need to switch BOUNTY and BIRAKE values
-                                tmp = info['BOUNTY']
-                                info['BOUNTY'] = info['BIRAKE']
-                                info['BIRAKE'] = tmp
-                                info['BOUNTY'] = info['BOUNTY'].strip(u'$€') # Strip here where it isn't 'None'
-                                hand.koBounty = int(100*Decimal(info['BOUNTY']))
-                                hand.isKO = True
-                            else:
-                                hand.isKO = False
+                    if info['BIBOUNTY'] is not None:
+                        info['BIBOUNTY'] = info['BIBOUNTY'].strip(u'$€') # Strip here where it isn't 'None'
+                        #NOTE: This implies we shall find PL_BOUNTY when reading player stacks
+                        hand.isKO = True
+                    else:
+                        info['BIBOUNTY'] = 0
+                        hand.isKO = False
 
-                            info['BIRAKE'] = info['BIRAKE'].strip(u'$€')
+                    if info['BIBOUNTY'] is not None:
+                        info['BIRAKE'] = info['BIRAKE'].strip(u'$€')
+                    else:
+                        nfo['BIRAKE'] = 0
 
-                            # TODO: Is this correct? Old code tried to
-                            # conditionally multiply by 100, but we
-                            # want hand.buyin in 100ths of
-                            # dollars/euros (so hand.buyin = 90 for $0.90 BI).
-                            hand.buyin = int(100 * Decimal(info['BIAMT']))
-                            hand.fee = int(100 * Decimal(info['BIRAKE']))
-                        else:
-                            hand.buyin = int(Decimal(info['BIAMT']))
-                            hand.fee = 0
-                        if hand.buyin == 0 and hand.fee == 0:
-                            hand.buyinCurrency = "FREE"
+                # if and.buyinCurrency != "play": # may be useful, depends what other site parsers are doing
+                hand.buyin = int(100 * Decimal(info['BIAMT']))
+                hand.bounty = int(100 * Decimal(info['BIBOUNTY']))
+                hand.fee = int(100 * Decimal(info['BIRAKE']))
+
+                if hand.buyin == 0 and hand.fee == 0:
+                    hand.buyinCurrency = "FREE"
 
             if key == 'LEVEL':
                 hand.level = info[key]
@@ -347,8 +324,8 @@ class Winamax(HandHistoryConverter):
         # Get list of players in header.
         for a in m:
             if plist.get(a.group('PNAME')) is None:
-                hand.addPlayer(int(a.group('SEAT')), a.group('PNAME'), a.group('CASH'))
-                plist[a.group('PNAME')] = [int(a.group('SEAT')), a.group('CASH')]
+                hand.addPlayer(int(a.group('SEAT')), a.group('PNAME'), a.group('PL_STACK'), bounty=a.group('PL_BOUNTY'))
+                plist[a.group('PNAME')] = [int(a.group('SEAT')), a.group('PL_STACK')]
 
     def markStreets(self, hand):
         if hand.gametype['base'] == "hold":
