@@ -67,6 +67,9 @@ class TourneySummary(object):
 
 
     def __init__(self, db, config, siteName, summaryText, in_path='-', builtFrom="HHC", header=""):
+        import traceback
+        traceback.print_exc(file=sys.stdout)
+        print("TourneySummary")
         self.db = db
         self.config = config
         self.import_parameters = self.config.get_import_parameters()

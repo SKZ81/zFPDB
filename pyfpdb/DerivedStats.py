@@ -226,6 +226,7 @@ class DerivedStats():
 
         #hand.players = [[seat, name, chips],[seat, name, chips]]
         for player in hand.players:
+            print("player: ", player)
             player_name = player[1]
             player_stats = self.handsplayers.get(player_name)
             player_stats['seatNo'] = player[0]

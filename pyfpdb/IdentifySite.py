@@ -144,6 +144,7 @@ class IdentifySite:
         if not hhcs:
             hhcs = self.config.hhcs
         for site, hhc in hhcs.items():
+            print("load HHC for site:", site)
             filter = hhc.converter
             filter_name = filter.replace("ToFpdb", "")
             summary = hhc.summaryImporter

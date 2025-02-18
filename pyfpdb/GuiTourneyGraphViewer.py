@@ -270,4 +270,5 @@ if __name__ == "__main__":
     main_window.setCentralWidget(i)
     main_window.show()
     main_window.resize(1400, 800)
+    print('coucou')
     app.exec_()

@@ -1136,6 +1136,7 @@ You can find the full license texts in agpl-3.0.txt, gpl-2.0.txt, gpl-3.0.txt an
                 options.yloc = 0
             self.move(options.xloc, options.yloc)
         
+        print("VERSION : %s" % (VERSION, ))
         self.setWindowTitle("Free Poker DB - v%s" % (VERSION, ))
 
         # set a default x/y size for the window

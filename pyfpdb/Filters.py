@@ -455,6 +455,7 @@ class Filters(QWidget):
         result = self.db.cursor.fetchall()
         if len(result) >= 1:
             for line in sorted(result, key = lambda game: self.gameName[game[0]]):
+                print("getGames:", line[0])
                 self.cbGames[line[0]] = QCheckBox(self.gameName[line[0]])
                 self.cbGames[line[0]].setChecked(True)
                 vbox1.addWidget(self.cbGames[line[0]])

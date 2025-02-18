@@ -189,6 +189,7 @@ class Winamax(HandHistoryConverter):
             raise FpdbParseError
 
         mg = m.groupdict()
+        # print("HandInfo parsed: " + str(mg))
 
         if mg.get('TOUR'):
             info['type'] = 'tour'
