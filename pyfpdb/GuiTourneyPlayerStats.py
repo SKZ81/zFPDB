@@ -21,9 +21,9 @@ _ = L10n.get_translation()
 
 from time import time, strftime
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import (QStandardItem, QStandardItemModel)
-from PyQt5.QtWidgets import (QFrame, QScrollArea, QSplitter,
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import (QStandardItem, QStandardItemModel)
+from PyQt6.QtWidgets import (QFrame, QScrollArea, QSplitter,
                              QTableView, QVBoxLayout)
 
 import Charset
@@ -98,7 +98,7 @@ class GuiTourneyPlayerStats(QSplitter):
         self.stats_frame = QFrame()
         self.stats_frame.setLayout(QVBoxLayout())
 
-        self.stats_vbox = QSplitter(Qt.Vertical)
+        self.stats_vbox = QSplitter(Qt.Orientation.Vertical)
         self.stats_frame.layout().addWidget(self.stats_vbox)
         # self.fillStatsFrame(self.stats_vbox)
 
@@ -163,7 +163,7 @@ class GuiTourneyPlayerStats(QSplitter):
                 if value != None and value != -999:
                     item = QStandardItem(column[colformat] % value)
                 item.setEditable(False)
-                item.setTextAlignment(Qt.AlignRight)
+                item.setTextAlignment(Qt.AlignmentFlag.AlignRight)
                 treerow.append(item)
             self.liststore[grid].appendRow(treerow)
             sqlrow += 1
@@ -293,7 +293,7 @@ class GuiTourneyPlayerStats(QSplitter):
         self.liststore = []
         self.listcols = []
         #self.stats_vbox = gtk.VBox(False, 0)
-        self.stats_vbox = QSplitter(Qt.Vertical)
+        self.stats_vbox = QSplitter(Qt.Orientation.Vertical)
         self.stats_frame.layout().addWidget(self.stats_vbox)
         self.fillStatsFrame(self.stats_vbox)
 #        if self.last_pos > 0:
@@ -327,7 +327,7 @@ if __name__ == "__main__":
     settings.update(config.get_import_parameters())
     settings.update(config.get_default_paths())
 
-    from PyQt5.QtWidgets import QApplication, QMainWindow
+    from PyQt6.QtWidgets import QApplication, QMainWindow
     app = QApplication([])
     import SQL
     sql = SQL.Sql(db_server=settings['db-server'])

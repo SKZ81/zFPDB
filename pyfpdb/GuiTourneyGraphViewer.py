@@ -25,7 +25,7 @@ import traceback
 from time import *
 from datetime import datetime
 
-from PyQt5.QtWidgets import (QFrame, QScrollArea, QSplitter, QVBoxLayout)
+from PyQt6.QtWidgets import (QFrame, QScrollArea, QSplitter, QVBoxLayout)
 
 import Database
 import Filters
@@ -261,7 +261,7 @@ if __name__ == "__main__":
     settings.update(config.get_import_parameters())
     settings.update(config.get_default_paths())
 
-    from PyQt5.QtWidgets import QApplication, QMainWindow
+    from PyQt6.QtWidgets import QApplication, QMainWindow
     app = QApplication([])
     import SQL
     sql = SQL.Sql(db_server=settings['db-server'])

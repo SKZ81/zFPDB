@@ -21,9 +21,9 @@ _ = L10n.get_translation()
 import xml.dom.minidom
 from xml.dom.minidom import Node
 
-from PyQt5.QtWidgets import (QDialog, QDialogButtonBox, QVBoxLayout, QTreeWidget,
+from PyQt6.QtWidgets import (QDialog, QDialogButtonBox, QVBoxLayout, QTreeWidget,
                              QTreeWidgetItem)
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import Qt
 
 import Configuration
 
@@ -74,7 +74,7 @@ class GuiPrefs(QDialog):
     def updateConf(self, item, column):
         if column != 1:
             return
-        item.data(1, Qt.UserRole).value = item.data(1, Qt.DisplayRole)
+        item.data(1, Qt.ItemDataRole.UserRole).value = item.data(1, Qt.ItemDataRole.DisplayRole)
 
     def rewriteText(self, s):
         upd = False
@@ -99,8 +99,8 @@ class GuiPrefs(QDialog):
                 for i in range(node.attributes.length):
                     localName,updated = self.rewriteText( node.attributes.item(i).localName )
                     attritem = QTreeWidgetItem(item, [localName, node.attributes.item(i).value])
-                    attritem.setData(1, Qt.UserRole, node.attributes.item(i))
-                    attritem.setFlags(attritem.flags() | Qt.ItemIsEditable)
+                    attritem.setData(1, Qt.ItemDataRole.UserRole, node.attributes.item(i))
+                    attritem.setFlags(attritem.flags() | Qt.ItemFlag.ItemIsEditable)
 
                     if node.attributes.item(i).localName in ('site_name', 'game_name', 'stat_name', 'name', 'db_server', 'site', 'col_name'):
                         name = " " + node.attributes.item(i).value
@@ -118,10 +118,10 @@ if __name__=="__main__":
 
     config = Configuration.Config()
 
-    from PyQt5.QtWidgets import QApplication, QMainWindow
+    from PyQt6.QtWidgets import QApplication, QMainWindow
     app = QApplication([])
     main_window = QMainWindow()
     main_window.show()
     prefs = GuiPrefs(config, main_window)
-    prefs.exec_()
-    app.exec_()
+    prefs.exec()
+    app.exec()

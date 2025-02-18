@@ -3,7 +3,7 @@ Edit: forked from philroberts/FPDB-for-OSX on 06/11/2023 (branch [qtfork](philro
 Qt branch notes
 ===============
 
-This is a port of fpdb to Qt (specifically, PyQt5).  It is a work in
+This is a port of fpdb to Qt (specifically, PyQt6).  It is a work in
 progress.  Please
 [report](https://github.com/philroberts/FPDB-for-OSX/issues) bugs or
 missing features!  Note: despite the name of this repository, I have

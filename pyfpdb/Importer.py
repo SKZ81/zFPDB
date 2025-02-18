@@ -29,8 +29,8 @@ import re
 
 import logging, traceback
 
-from PyQt5.QtWidgets import QProgressBar, QLabel, QDialog, QVBoxLayout
-from PyQt5.QtCore import QCoreApplication
+from PyQt6.QtWidgets import QProgressBar, QLabel, QDialog, QVBoxLayout
+from PyQt6.QtCore import QCoreApplication
 
 #    fpdb/FreePokerTools modules
 import Database

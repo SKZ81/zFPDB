@@ -31,7 +31,7 @@ import logging
 # logging has been set up in fpdb.py or HUD_main.py, use their settings:
 log = logging.getLogger("hud")
 
-from PyQt5.QtGui import QWindow
+from PyQt6.QtGui import QWindow
 
 #    Other Library modules
 import win32gui

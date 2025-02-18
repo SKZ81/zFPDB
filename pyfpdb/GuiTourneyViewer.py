@@ -17,7 +17,7 @@
 
 import L10n
 _ = L10n.get_translation()
-from PyQt5.QtWidgets import (QSplitter, QScrollArea, QFrame, QVBoxLayout)
+from PyQt6.QtWidgets import (QSplitter, QScrollArea, QFrame, QVBoxLayout)
 
 import Filters
 

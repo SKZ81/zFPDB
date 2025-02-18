@@ -31,9 +31,9 @@ import logging
 # logging has been set up in fpdb.py or HUD_main.py, use their settings:
 log = logging.getLogger("hud")
 
-from PyQt5.QtCore import QObject
-from PyQt5.QtGui import (QPainter, QPixmap, QStandardItem, QStandardItemModel)
-from PyQt5.QtWidgets import (QGridLayout, QLabel, QTableView,
+from PyQt6.QtCore import QObject
+from PyQt6.QtGui import (QPainter, QPixmap, QStandardItem, QStandardItemModel)
+from PyQt6.QtWidgets import (QGridLayout, QLabel, QTableView,
                              QVBoxLayout, QWidget)
 
 #    FreePokerTools modules

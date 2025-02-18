@@ -18,9 +18,9 @@
 import L10n
 _ = L10n.get_translation()
 
-from PyQt5.QtCore import QCoreApplication, QSortFilterProxyModel, Qt
-from PyQt5.QtGui import QPainter, QPixmap, QStandardItem, QStandardItemModel
-from PyQt5.QtWidgets import (QApplication, QFrame, QMenu,
+from PyQt6.QtCore import QCoreApplication, QSortFilterProxyModel, Qt
+from PyQt6.QtGui import QPainter, QPixmap, QStandardItem, QStandardItemModel
+from PyQt6.QtWidgets import (QApplication, QFrame, QMenu,
                             QComboBox, QLabel, QLineEdit, QPushButton,
                             QProgressDialog, QScrollArea, QSplitter,
                             QTableView, QHBoxLayout, QVBoxLayout)
@@ -50,13 +50,13 @@ class GuiTourneyListViewer(GuiTourneyViewer):
                  }
 
         self.table = QTableView()
-        self.table.setSelectionBehavior(QTableView.SelectRows)
+        self.table.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
         self.model = QStandardItemModel(0, len(self.colnum), self.table)
         self.model.setHorizontalHeaderLabels(self.colnum.keys())
 
         self.filterModel = QSortFilterProxyModel()
         self.filterModel.setSourceModel(self.model)
-        self.filterModel.setSortRole(Qt.UserRole)
+        self.filterModel.setSortRole(Qt.ItemDataRole.UserRole)
         self.table.setModel(self.filterModel)
         self.table.verticalHeader().hide()
         # self.table.doubleClicked.connect(self.row_activated)
@@ -101,7 +101,7 @@ class GuiTourneyListViewer(GuiTourneyViewer):
             for index, item in enumerate(modelrow):
                 item.setEditable(False)
                 if index in (self.colnum['Buyin'], self.colnum['Fee'], self.colnum['Prize']) and item.data() != None:
-                    item.setData(float(item.data(Qt.DisplayRole)), Qt.UserRole)
+                    item.setData(float(item.data(Qt.ItemDataRole.DisplayRole)), Qt.ItemDataRole.UserRole)
             self.model.appendRow(modelrow)
             self.table.resizeColumnsToContents()
             self.table.resizeRowsToContents()

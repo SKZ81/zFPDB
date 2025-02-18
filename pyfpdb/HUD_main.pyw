@@ -38,10 +38,10 @@ import time
 import string
 import logging
 
-from PyQt5.QtCore import (QCoreApplication, QMetaObject, QObject, Qt,
+from PyQt6.QtCore import (QCoreApplication, QMetaObject, QObject, Qt,
                           QThread, pyqtSignal)
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (QApplication, QLabel, QMainWindow,
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import (QApplication, QLabel, QMainWindow,
                              QVBoxLayout, QWidget)
 
 #    FreePokerTools modules
@@ -119,7 +119,7 @@ class HUD_main(QObject):
         self.stdinThread.start()
 
         # a main window
-        self.main_window = QWidget(None, Qt.Dialog)
+        self.main_window = QWidget(None, Qt.WindowType.Dialog)
 
         if options.xloc is not None or options.yloc is not None:
             if options.xloc is None:

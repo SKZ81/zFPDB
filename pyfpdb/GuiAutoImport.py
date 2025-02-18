@@ -27,9 +27,9 @@ import sys
 
 import logging
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QPushButton, QLineEdit, QTextEdit, QCheckBox, QFileDialog
-from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QTextCursor
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSpinBox, QPushButton, QLineEdit, QTextEdit, QCheckBox, QFileDialog
+from PyQt6.QtCore import QTimer
+from PyQt6.QtGui import QTextCursor
 
 import Importer
 from optparse import OptionParser
@@ -337,7 +337,7 @@ if __name__== "__main__":
     settings['cl_options'] = string.join(sys.argv[1:])
 
     if(options.gui == True):
-        from PyQt5.QtWidgets import QApplication, QMainWindow
+        from PyQt6.QtWidgets import QApplication, QMainWindow
         app = QApplication([])
         i = GuiAutoImport(settings, config, None, None)
         main_window = QMainWindow()

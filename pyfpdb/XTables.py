@@ -27,7 +27,7 @@ _ = L10n.get_translation()
 import re
 import logging
 
-from PyQt5.QtGui import QWindow
+from PyQt6.QtGui import QWindow
 
 #    Other Library modules
 import xcffib, xcffib.xproto

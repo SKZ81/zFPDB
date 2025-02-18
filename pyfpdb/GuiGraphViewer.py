@@ -19,8 +19,8 @@ from __future__ import print_function
 import L10n
 _ = L10n.get_translation()
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QScrollArea, QSizePolicy,
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QScrollArea, QSizePolicy,
                              QSplitter, QVBoxLayout, QWidget)
 import sys
 from time import time
@@ -349,7 +349,7 @@ if __name__ == "__main__":
     settings.update(config.get_import_parameters())
     settings.update(config.get_default_paths())
 
-    from PyQt5.QtWidgets import QApplication, QMainWindow
+    from PyQt6.QtWidgets import QApplication, QMainWindow
     app = QApplication([])
     import SQL
     sql = SQL.Sql(db_server=settings['db-server'])

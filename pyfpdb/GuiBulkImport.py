@@ -26,7 +26,7 @@ from time import time
 from optparse import OptionParser
 import traceback
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QFileDialog
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QFileDialog
 
 #    fpdb/FreePokerTools modules
 import Options
@@ -193,7 +193,7 @@ if __name__ == '__main__':
     settings['global_lock'] = interlocks.InterProcessLock(name="fpdb_global_lock")
     settings['cl_options'] = " ".join(sys.argv[1:])
 
-    from PyQt5.QtWidgets import QApplication, QMainWindow
+    from PyQt6.QtWidgets import QApplication, QMainWindow
     app = QApplication([])
     main_window = QMainWindow()
     main_window.setCentralWidget(GuiBulkImport(settings, config))

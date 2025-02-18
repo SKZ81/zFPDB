@@ -32,9 +32,9 @@ import SQL
 import Filters
 import Deck
 
-from PyQt5.QtCore import QCoreApplication, QSortFilterProxyModel, Qt
-from PyQt5.QtGui import (QPainter, QPixmap, QStandardItem, QStandardItemModel)
-from PyQt5.QtWidgets import (QApplication, QFrame, QMenu,
+from PyQt6.QtCore import QCoreApplication, QSortFilterProxyModel, Qt
+from PyQt6.QtGui import (QPainter, QPixmap, QStandardItem, QStandardItemModel)
+from PyQt6.QtWidgets import (QApplication, QFrame, QMenu,
                              QProgressDialog, QScrollArea, QSplitter,
                              QTableView, QVBoxLayout)
 
@@ -112,7 +112,7 @@ class GuiHandViewer(QSplitter):
         self.model = QStandardItemModel(0, len(self.colnum), self.view)
         self.filterModel = QSortFilterProxyModel()
         self.filterModel.setSourceModel(self.model)
-        self.filterModel.setSortRole(Qt.UserRole)
+        self.filterModel.setSortRole(Qt.ItemDataRole.UserRole)
 
         self.view.setModel(self.filterModel)
         self.view.verticalHeader().hide()
@@ -243,12 +243,12 @@ class GuiHandViewer(QSplitter):
         for index, item in enumerate(modelrow):
             item.setEditable(False)
             if index in (self.colnum['Street0'], self.colnum['Street1-4']):
-                cards = item.data(Qt.DisplayRole)
-                item.setData(self.render_cards(cards), Qt.DecorationRole)
-                item.setData("", Qt.DisplayRole)
-                item.setData(cards, Qt.UserRole + 1)
+                cards = item.data(Qt.ItemDataRole.DisplayRole)
+                item.setData(self.render_cards(cards), Qt.ItemDataRole.DecorationRole)
+                item.setData("", Qt.ItemDataRole.DisplayRole)
+                item.setData(cards, Qt.ItemDataRole.UserRole + 1)
             if index in (self.colnum['Bet'], self.colnum['Net'], self.colnum['Won']):
-                item.setData(float(item.data(Qt.DisplayRole)), Qt.UserRole)
+                item.setData(float(item.data(Qt.ItemDataRole.DisplayRole)), Qt.ItemDataRole.UserRole)
         self.model.appendRow(modelrow)
 
     def copyHandToClipboard(self, checkState, hand):
@@ -275,7 +275,7 @@ class GuiHandViewer(QSplitter):
         """ Returns true if the cards of the given row are in the card filter """
         # Does work but all cards that should NOT be displayed have to be clicked.
         card_filter = self.filters.getCards() 
-        hcs = self.model.data(self.model.index(rownum, self.colnum['Street0']), Qt.UserRole + 1).split(' ')
+        hcs = self.model.data(self.model.index(rownum, self.colnum['Street0']), Qt.ItemDataRole.UserRole + 1).split(' ')
         
         if '0x' in hcs:      #if cards are unknown return True
             return True
@@ -338,7 +338,7 @@ if __name__ == "__main__":
     settings.update(config.get_import_parameters())
     settings.update(config.get_default_paths())
 
-    from PyQt5.QtWidgets import QMainWindow
+    from PyQt6.QtWidgets import QMainWindow
     app = QApplication([])
     sql = SQL.Sql(db_server=settings['db-server'])
     main_window = QMainWindow()

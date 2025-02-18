@@ -30,9 +30,9 @@ import Database
 import SQL
 import Deck
 
-from PyQt5.QtCore import (QPoint, QRect, QRectF, Qt, QTimer)
-from PyQt5.QtGui import (QColor, QImage, QPainter, QPainterPath, QPen)
-from PyQt5.QtWidgets import (QHBoxLayout, QPushButton, QSlider, QVBoxLayout,
+from PyQt6.QtCore import (QPoint, QRect, QRectF, Qt, QTimer)
+from PyQt6.QtGui import (QColor, QImage, QPainter, QPainterPath, QPen)
+from PyQt6.QtWidgets import (QHBoxLayout, QPushButton, QSlider, QVBoxLayout,
                              QWidget)
 
 import math
@@ -68,25 +68,25 @@ class GuiReplayer(QWidget):
         self.buttonBox = QHBoxLayout()
         self.prevButton = QPushButton("Prev")
         self.prevButton.clicked.connect(self.prev_clicked)
-        self.prevButton.setFocusPolicy(Qt.NoFocus)
+        self.prevButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.startButton = QPushButton("Start")
         self.startButton.clicked.connect(self.start_clicked)
-        self.startButton.setFocusPolicy(Qt.NoFocus)
+        self.startButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.endButton = QPushButton("End")
         self.endButton.clicked.connect(self.end_clicked)
-        self.endButton.setFocusPolicy(Qt.NoFocus)
+        self.endButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.playPauseButton = QPushButton("Play")
         self.playPauseButton.clicked.connect(self.play_clicked)
-        self.playPauseButton.setFocusPolicy(Qt.NoFocus)
+        self.playPauseButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.nextButton = QPushButton("Next")
         self.nextButton.clicked.connect(self.next_clicked)
-        self.nextButton.setFocusPolicy(Qt.NoFocus)
+        self.nextButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.replayBox.addLayout(self.buttonBox)
 
-        self.stateSlider = QSlider(Qt.Horizontal)
+        self.stateSlider = QSlider(Qt.Orientation.Horizontal)
         self.stateSlider.valueChanged.connect(self.slider_changed)
-        self.stateSlider.setFocusPolicy(Qt.NoFocus)
+        self.stateSlider.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.replayBox.addWidget(self.stateSlider, False)
 
@@ -145,31 +145,31 @@ class GuiReplayer(QWidget):
             playery = converty(player.y)
             painter.drawImage(QPoint(playerx - self.playerBackdrop.width() // 2, playery - 3), self.playerBackdrop)
             if player.action=="folds":
-                painter.setPen(QColor("grey"))
+                painter.Qt.GlobalColor.grey
             else:
-                painter.setPen(QColor("white"))
+                painter.Qt.GlobalColor.white
                 x = playerx - self.cardwidth * len(player.holecards) // 2
                 self.renderCards(painter, player.holecards,
                                  x, playery - self.cardheight)
 
             painter.drawText(QRect(playerx - 100, playery, 200, 20),
-                             Qt.AlignCenter,
+                             Qt.AlignmentFlag.AlignCenter,
                              '%s %s%.2f' % (player.name,
                                             self.currency,
                                             player.stack))
 
             if player.justacted:
-                painter.setPen(QColor("yellow"))
-                painter.drawText(QRect(playerx - 50, playery + 15, 100, 20), Qt.AlignCenter, player.action)
+                painter.Qt.GlobalColor.yellow
+                painter.drawText(QRect(playerx - 50, playery + 15, 100, 20), Qt.AlignmentFlag.AlignCenter, player.action)
             else:
-                painter.setPen(QColor("white"))
+                painter.Qt.GlobalColor.white
 
             if player.chips != 0:
                 painter.drawText(QRect(convertx(player.x * .65) - 100,
                                         converty(player.y * 0.65),
                                         200,
                                         20),
-                                    Qt.AlignCenter,
+                                    Qt.AlignmentFlag.AlignCenter,
                                     '%s%.2f' % (self.currency, player.chips))
 
             if player.bounty:
@@ -180,23 +180,23 @@ class GuiReplayer(QWidget):
                         playery - 26,
                         30, 20),
                     10, 10)
-                pen = QPen(Qt.black, 2)
+                pen = QPen(Qt.GlobalColor.black, 2)
                 painter.setPen(pen)
-                painter.fillPath(path, Qt.red)
+                painter.fillPath(path, Qt.GlobalColor.red)
                 painter.drawPath(path)
-                painter.setPen(QColor("white"))
+                painter.Qt.GlobalColor.white
                 painter.drawText(QRect(
                         playerx - 30 + self.playerBackdrop.width() // 2,
                         playery - 26, 30, 20),
-                    Qt.AlignCenter, str(player.bounty))
-        painter.setPen(QColor("white"))
+                    Qt.AlignmentFlag.AlignCenter, str(player.bounty))
+        painter.Qt.GlobalColor.white
 
         if state.pot > 0:
             painter.drawText(QRect(self.tableImage.width() // 2 - 100,
                                    self.tableImage.height() // 2 - 20,
                                    200,
                                    40),
-                             Qt.AlignCenter,
+                             Qt.AlignmentFlag.AlignCenter,
                              '%s%.2f' % (self.currency, state.pot))
 
         for street in state.renderBoard:
@@ -221,20 +221,20 @@ class GuiReplayer(QWidget):
             self.play_hand(self.handidx - 1)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Left:
+        if event.key() == Qt.Key.Key_Left:
             if self.stateSlider.value() > 0:
                 self.stateSlider.setValue(self.stateSlider.value() - 1)
             else:
                 self.previousHand()
-        elif event.key() == Qt.Key_Right:
+        elif event.key() == Qt.Key.Key_Right:
             if self.stateSlider.value() < self.stateSlider.maximum():
                 self.stateSlider.setValue(self.stateSlider.value() + 1)
             else:
                 self.nextHand()
 
-        elif event.key() == Qt.Key_Up:
+        elif event.key() == Qt.Key.Key_Up:
             self.previousHand()
-        elif event.key() == Qt.Key_Down:
+        elif event.key() == Qt.Key.Key_Down:
             self.nextHand()
         else:
             QWidget.keyPressEvent(self, event)
@@ -283,7 +283,7 @@ class GuiReplayer(QWidget):
             self.buttonBox.addWidget(btn)
             btn.clicked.connect(partial(self.street_clicked, street=street))
             btn.setEnabled(street in seenStreets)
-            btn.setFocusPolicy(Qt.NoFocus)
+            btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonBox.addWidget(self.endButton)
         self.buttonBox.addWidget(self.playPauseButton)
         self.buttonBox.addWidget(self.nextButton)
@@ -499,7 +499,7 @@ if __name__ == '__main__':
     db = Database.Database(config)
     sql = SQL.Sql(db_server = config.get_db_parameters()['db-server'])
 
-    from PyQt5.QtWidgets import QApplication
+    from PyQt6.QtWidgets import QApplication
     app = QApplication([])
     handlist = [10, 39, 40, 72, 369, 390]
     replayer = GuiReplayer(config, sql, None, handlist)

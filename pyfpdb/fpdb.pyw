@@ -39,9 +39,9 @@ cl_options = str(" ").join(sys.argv[1:])
 
 import logging
 
-from PyQt5.QtCore import (QCoreApplication, QDate, Qt)
-from PyQt5.QtGui import (QScreen,)
-from PyQt5.QtWidgets import (QAction, QApplication, QCalendarWidget,
+from PyQt6.QtCore import (QCoreApplication, QDate, Qt)
+from PyQt6.QtGui import (QScreen, QAction)
+from PyQt6.QtWidgets import (QApplication, QCalendarWidget,
                              QCheckBox, QDateEdit, QDialog,
                              QDialogButtonBox, QFileDialog,
                              QGridLayout, QHBoxLayout, QInputDialog,
@@ -669,7 +669,7 @@ class fpdb(QMainWindow):
                 
         for header_number in range (0, len(column_headers)):
             label = QLabel(column_headers[header_number])
-            label.setAlignment(Qt.AlignCenter)
+            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             table.addWidget(label, 0, header_number)
         
         check_buttons=[]
@@ -894,7 +894,7 @@ class fpdb(QMainWindow):
             diaConfigVersionWarning.layout().addWidget(label)
 
             label = QLabel(_("To create a new configuration, see fpdb.sourceforge.net/apps/mediawiki/fpdb/index.php?title=Reset_Configuration"))
-            label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             diaConfigVersionWarning.layout().addWidget(label)
             label = QLabel(_("A new configuration will destroy all personal settings (hud layout, site folders, screennames, favourite seats)")+"\n")
             diaConfigVersionWarning.layout().addWidget(label)
@@ -1309,4 +1309,4 @@ You can find the full license texts in agpl-3.0.txt, gpl-2.0.txt, gpl-3.0.txt an
 if __name__ == "__main__":
     app = QApplication([])
     me = fpdb()
-    app.exec_()
+    app.exec()

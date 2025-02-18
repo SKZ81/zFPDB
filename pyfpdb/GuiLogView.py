@@ -20,8 +20,8 @@ _ = L10n.get_translation()
 
 # import queue
 
-from PyQt5.QtGui import (QStandardItem, QStandardItemModel)
-from PyQt5.QtWidgets import (QApplication, QDialog, QPushButton, QHBoxLayout, QRadioButton,
+from PyQt6.QtGui import (QStandardItem, QStandardItemModel)
+from PyQt6.QtWidgets import (QApplication, QDialog, QPushButton, QHBoxLayout, QRadioButton,
                              QTableView, QVBoxLayout, QWidget)
 
 import os
@@ -163,7 +163,7 @@ class GuiLogView(QWidget):
 if __name__=="__main__":
     config = Configuration.Config()
 
-    from PyQt5.QtWidgets import QApplication, QMainWindow
+    from PyQt6.QtWidgets import QApplication, QMainWindow
     app = QApplication([])
     main_window = QMainWindow()
     i = GuiLogView(config, main_window, None)

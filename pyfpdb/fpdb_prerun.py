@@ -22,7 +22,7 @@ failure_list = []
 success_list = []
 verbose = False
 
-global_modules_to_test =   ["PyQt5",
+global_modules_to_test =   ["PyQt6",
                             "matplotlib",
                             "numpy",
                             "pylab",

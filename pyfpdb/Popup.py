@@ -36,9 +36,9 @@ try:
 except ImportError:
     NSView = None
 
-from PyQt5.QtGui import QCursor
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGridLayout, QLabel, QVBoxLayout, QWidget
+from PyQt6.QtGui import QCursor
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QGridLayout, QLabel, QVBoxLayout, QWidget
 
 #    FreePokerTools modules
 import Stats
@@ -46,7 +46,10 @@ import Stats
 class Popup(QWidget):
 
     def __init__(self, seat = None, stat_dict = None, win = None, pop = None, hand_instance = None, config = None, parent_popup = None):
-        super(Popup, self).__init__(parent_popup or win, Qt.Window | Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus)
+        super(Popup, self).__init__(parent_popup or win,
+                                    Qt.WindowType.Window |
+                                    Qt.WindowType.FramelessWindowHint
+                                    Qt.WindowType.WindowDoesNotAcceptFocus)
         self.seat = seat
         self.stat_dict = stat_dict
         self.win = win

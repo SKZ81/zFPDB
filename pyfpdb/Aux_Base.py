@@ -32,8 +32,8 @@ import logging
 # logging has been set up in fpdb.py or HUD_main.py, use their settings:
 log = logging.getLogger("hud")
 
-from PyQt5.QtCore import Qt, QObject
-from PyQt5.QtWidgets import QWidget
+from PyQt6.QtCore import Qt, QObject
+from PyQt6.QtWidgets import QWidget
 
 #   FPDB
 import Card
@@ -96,30 +96,30 @@ class Aux_Window(object):
             if seat == dict['seat']:
                 return id
         return None
-        
+        WindowType.
 class Seat_Window(QWidget):
     def __init__(self, aw = None, seat = None):
-        super(Seat_Window, self).__init__(None, Qt.Window | Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus) # FIXME acceptfocus?  splashscreen?
+        super(Seat_Window, self).__init__(None, Qt.WindowType.Window | Qt.WindowType.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus) # FIXME acceptfocus?  splashscreen?
         self.lastPos = None
         self.aw = aw
         self.seat = seat
         self.resize(10,10)
-        self.setAttribute(Qt.WA_AlwaysShowToolTips)
+        self.setAttribute(Qt.WidgetAttribute.WA_AlwaysShowToolTips)
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.button_press_left(event)
-        elif event.button() == Qt.MiddleButton:
+        elif event.button() == Qt.MouseButton.MiddleButton:
             self.button_press_middle(event)
-        elif event.button() == Qt.RightButton:
+        elif event.button() == Qt.MouseButton.RightButton:
             self.button_press_right(event)
 
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.button_release_left(event)
-        elif event.button() == Qt.MiddleButton:
+        elif event.button() == Qt.MouseButton.MiddleButton:
             self.button_release_middle(event)
-        elif event.button() == Qt.RightButton:
+        elif event.button() == Qt.MouseButton.RightButton:
             self.button_release_right(event)
 
     def button_press_left(self, event):

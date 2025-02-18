@@ -24,9 +24,9 @@ import os
 import traceback
 from time import time, strftime, localtime, gmtime
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import (QStandardItem, QStandardItemModel)
-from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QScrollArea,
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import (QStandardItem, QStandardItemModel)
+from PyQt6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QScrollArea,
                              QSplitter, QTableView, QVBoxLayout, QWidget)
 
 try:
@@ -130,11 +130,11 @@ class GuiSessionViewer(QSplitter):
         self.stats_frame.setLayout(QVBoxLayout())
         self.view = None
         heading = QLabel(self.filterText['handhead'])
-        heading.setAlignment(Qt.AlignCenter)
+        heading.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.stats_frame.layout().addWidget(heading)
 
 
-        self.main_vbox = QSplitter(Qt.Vertical)
+        self.main_vbox = QSplitter(Qt.Orientation.Vertical)
 
         self.graphBox = QFrame()
         self.graphBox.setLayout(QVBoxLayout())
@@ -469,7 +469,7 @@ if __name__ == '__main__':
     settings.update(config.get_import_parameters())
     settings.update(config.get_default_paths())
 
-    from PyQt5.QtWidgets import QApplication, QMainWindow
+    from PyQt6.QtWidgets import QApplication, QMainWindow
     app = QApplication([])
     import SQL
     sql = SQL.Sql(db_server=settings['db-server'])

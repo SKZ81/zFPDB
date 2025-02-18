@@ -32,9 +32,9 @@ import logging
 log = logging.getLogger("hud")
 from functools import partial
 
-from PyQt5.QtGui import QCursor, QFont
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import (QComboBox, QGridLayout, QHBoxLayout,
+from PyQt6.QtGui import QCursor, QFont
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtWidgets import (QComboBox, QGridLayout, QHBoxLayout,
                              QLabel, QPushButton, QSpinBox,
                              QVBoxLayout, QWidget)
 
@@ -184,7 +184,7 @@ class Simple_stat(object):
     def __init__(self, stat, seat, popup, game_stat_config=None, aw=None):
         self.stat = stat
         self.lab = aw.aw_class_label("xxx") # xxx is used as initial value because longer labels don't shrink
-        self.lab.setAlignment(Qt.AlignCenter)
+        self.lab.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lab.aw_seat = aw.hud.layout.hh_seats[seat]
         self.lab.aw_popup = popup
         self.lab.stat_dict = None
@@ -254,7 +254,7 @@ class Simple_table_popup_menu(QWidget):
 
     def __init__(self, parentwin):
         
-        super(Simple_table_popup_menu, self).__init__(None, Qt.Window | Qt.FramelessWindowHint)
+        super(Simple_table_popup_menu, self).__init__(None, Qt.WindowType.Window | Qt.WindowType.FramelessWindowHint)
         self.parentwin = parentwin
         self.move(self.parentwin.hud.table.x + self.parentwin.aw.xshift,
                   self.parentwin.hud.table.y + self.parentwin.aw.yshift)

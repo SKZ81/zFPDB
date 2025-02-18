@@ -19,8 +19,8 @@ from __future__ import print_function
 import L10n
 _ = L10n.get_translation()
 
-from PyQt5.QtCore import QDate, QDateTime
-from PyQt5.QtWidgets import (QCalendarWidget, QCheckBox, QCompleter,
+from PyQt6.QtCore import QDate, QDateTime
+from PyQt6.QtWidgets import (QCalendarWidget, QCheckBox, QCompleter,
                              QDateEdit, QDialog, QGridLayout,
                              QGroupBox, QHBoxLayout, QLabel,
                              QLineEdit, QPushButton, QRadioButton,
@@ -933,7 +933,7 @@ if __name__ == '__main__':
                         "Button2"   : False
                           }
 
-    from PyQt5.QtWidgets import QMainWindow, QApplication
+    from PyQt6.QtWidgets import QMainWindow, QApplication
     app = QApplication([])
     i = Filters(db, display = filters_display)
     main_window = QMainWindow()

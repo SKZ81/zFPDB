@@ -21,9 +21,9 @@ _ = L10n.get_translation()
 
 from time import time
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import (QStandardItem, QStandardItemModel)
-from PyQt5.QtWidgets import (QCheckBox, QDialog, QDialogButtonBox,
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import (QStandardItem, QStandardItemModel)
+from PyQt6.QtWidgets import (QCheckBox, QDialog, QDialogButtonBox,
                              QFrame, QGridLayout, QHBoxLayout, QLabel,
                              QScrollArea, QSpinBox, QSplitter,
                              QTableView, QVBoxLayout, QWidget)
@@ -166,7 +166,7 @@ class GuiRingPlayerStats(QSplitter):
         self.stats_frame = QFrame()
         self.stats_frame.setLayout(QVBoxLayout())
 
-        self.stats_vbox = QSplitter(Qt.Vertical)
+        self.stats_vbox = QSplitter(Qt.Orientation.Vertical)
         self.stats_frame.layout().addWidget(self.stats_vbox)
 
         self.addWidget(scroll)
@@ -193,7 +193,7 @@ class GuiRingPlayerStats(QSplitter):
         self.listcols = []
         self.stats_frame.layout().removeWidget(self.stats_vbox)
         self.stats_vbox.setParent(None)
-        self.stats_vbox = QSplitter(Qt.Vertical)
+        self.stats_vbox = QSplitter(Qt.Orientation.Vertical)
         self.stats_frame.layout().addWidget(self.stats_vbox)
         self.fillStatsFrame(self.stats_vbox)
 
@@ -262,7 +262,7 @@ class GuiRingPlayerStats(QSplitter):
             frame.setLayout(vbox2)
             vbox.addWidget(frame)
             heading = QLabel(self.filterText['handhead'])
-            heading.setAlignment(Qt.AlignHCenter)
+            heading.setAlignment(Qt.AlignmentFlag.AlignHCenter)
             vbox2.addWidget(heading)
 
             # Detailed table
@@ -294,7 +294,7 @@ class GuiRingPlayerStats(QSplitter):
         assert len(self.liststore) == grid, "len(self.liststore)="+str(len(self.liststore))+" grid-1="+str(grid)
         view = QTableView()
         self.liststore.append(QStandardItemModel(0, len(self.cols_to_show), view))
-        self.liststore[grid].setSortRole(Qt.UserRole)
+        self.liststore[grid].setSortRole(Qt.ItemDataRole.UserRole)
         view.setModel(self.liststore[grid])
         view.verticalHeader().hide()
         vbox.addWidget(view)
@@ -365,10 +365,10 @@ class GuiRingPlayerStats(QSplitter):
                         sortValue = ['BB', 'SB', 'Btn', '1', '2', '3', '4', '5', '6', '7'].index(value)
                     else:
                         sortValue = float(value)
-                item.setData(sortValue, Qt.UserRole)
+                item.setData(sortValue, Qt.ItemDataRole.UserRole)
                 item.setEditable(False)
                 if col != 0:
-                    item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                    item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignVCenter)
                 if column[colalias] != 'game':
                     item.setToolTip('<big>%s for %s</big><br/><i>%s</i>' % (column[colheading],treerow[0].text(),onlinehelp[column[colheading]]))
                 treerow.append(item)
@@ -530,7 +530,7 @@ class GuiRingPlayerStats(QSplitter):
 
         label = QLabel(_("Hand Filters:"))
         handbox.addWidget(label)
-        label.setAlignment(Qt.AlignCenter)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         grid = QGridLayout()
         handbox.addLayout(grid)
@@ -552,7 +552,7 @@ class GuiRingPlayerStats(QSplitter):
                     break
 
             grid.addWidget(cb, row, 0)
-            grid.addWidget(lbl_from, row, 1, Qt.AlignLeft)
+            grid.addWidget(lbl_from, row, 1, Qt.AlignmentFlag.AlignLeft)
             grid.addWidget(lbl_tween, row, 2)
             grid.addWidget(sb1, row, 3)
             grid.addWidget(lbl_to, row, 4)
@@ -600,7 +600,7 @@ if __name__ == "__main__":
     settings.update(config.get_import_parameters())
     settings.update(config.get_default_paths())
 
-    from PyQt5.QtWidgets import QApplication, QMainWindow
+    from PyQt6.QtWidgets import QApplication, QMainWindow
     app = QApplication([])
     import SQL
     sql = SQL.Sql(db_server=settings['db-server'])
