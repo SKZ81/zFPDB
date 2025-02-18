@@ -244,7 +244,7 @@ class Importer:
         else:
             log.warning(_("Attempted to add non-directory '%s' as an import directory") % str(dir))
 
-    def runImport(self):
+    def runImport(self, progress_gui=True):
         """"Run full import on self.filelist. This is called from GuiBulkImport.py"""
 
         # Initial setup
@@ -256,7 +256,7 @@ class Importer:
         if 'dropHudCache' in self.settings and self.settings['dropHudCache'] == 'auto':
             self.settings['dropHudCache'] = self.calculate_auto2(self.database, 25.0, 500.0)    # returns "drop"/"don't drop"
 
-        (totstored, totdups, totpartial, totskipped, toterrors) = self.importFiles()
+        (totstored, totdups, totpartial, totskipped, toterrors) = self.importFiles(progress_gui)
 
         # Tidying up after import
         #if 'dropHudCache' in self.settings and self.settings['dropHudCache'] == 'drop':
@@ -275,7 +275,7 @@ class Importer:
         self.database.cleanUpWeeksMonths()
         self.database.resetClean()
 
-    def importFiles(self):
+    def importFiles(self, progress_gui=True):
         """"Read filenames in self.filelist and pass to despatcher."""
 
         totstored = 0
@@ -288,15 +288,19 @@ class Importer:
         fileerrorcount = 0
         moveimportedfiles = False #TODO need to wire this into GUI and make it prettier
         movefailedfiles = False #TODO and this too
-        
+
         #prepare progress popup window
-        ProgressDialog = ImportProgressDialog(len(self.filelist), self.parent)
-        ProgressDialog.resize(500, 200)
-        ProgressDialog.show()
-        
+        if progress_gui:
+            progressDialog = ImportProgressDialog(len(self.filelist), self.parent)
+            progressDialog.resize(500, 200)
+            progressDialog.show()
+
+        print(self.filelist)
+
         for f in self.filelist:
             filecount = filecount + 1
-            ProgressDialog.progress_update(f, str(self.database.getHandCount()))
+            if progress_gui:
+                progressDialog.progress_update(f, str(self.database.getHandCount()))
 
             (stored, duplicates, partial, skipped, errors, ttime) = self._import_despatch(self.filelist[f])
             totstored += stored
@@ -314,11 +318,12 @@ class Importer:
                     if movefailedfiles:
                         shutil.move(file, "c:\\fpdbfailed\\%d-%s" % (fileerrorcount, os.path.basename(file[3:]) ) )
             
-            self.logImport('bulk', f, stored, duplicates, partial, skipped, errors, ttime, self.filelist[f].fileId)
+            self.logImport(self.mode, f, stored, duplicates, partial, skipped, errors, ttime, self.filelist[f].fileId)
 
-        ProgressDialog.accept()
-        del ProgressDialog
-        
+        if progress_gui:
+            progressDialog.accept()
+            del progressDialog
+
         return (totstored, totdups, totpartial, totskipped, toterrors)
     # end def importFiles
 
