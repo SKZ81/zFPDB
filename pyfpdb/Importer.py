@@ -172,7 +172,12 @@ class Importer:
     def addImportFile(self, filename, site = "auto"):
         #print "addimportfile: filename is a", filename.__class__
         # filename not guaranteed to be unicode
-        if self.filelist.get(filename)!=None or not os.path.exists(filename):
+        if self.filelist.get(filename)!=None:
+            log.warning("Importer.addImportFile: file '%s' already in import list" % filename)
+            return False
+
+        if not os.path.exists(filename):
+            log.warning("Importer.addImportFile: file '%s' does not exist on filesystem, ignore" % filename)
             return False
 
         self.idsite.processFile(filename)
@@ -378,7 +383,8 @@ class Importer:
                     if stat_info.st_size > self.updatedsize[f] or stat_info.st_mtime > self.updatedtime[f]:
                         try:
                             if not os.path.isdir(f):
-                                self.caller.addText("\n"+os.path.basename(f))
+                                if self.caller:
+                                    self.caller.addText("\n"+os.path.basename(f))
                         except KeyError:
                             log.error("File '%s' seems to have disappeared" % f)
                         (stored, duplicates, partial, skipped, errors, ttime) = self._import_despatch(self.filelist[f])
@@ -386,7 +392,8 @@ class Importer:
                         self.database.commit()
                         try:
                             if not os.path.isdir(f): # Note: This assumes that whatever calls us has an "addText" func
-                                self.caller.addText(" %d stored, %d duplicates, %d partial, %d skipped, %d errors (time = %f)" % (stored, duplicates, partial, skipped, errors, ttime))
+                                if self.caller:
+                                    self.caller.addText(" %d stored, %d duplicates, %d partial, %d skipped, %d errors (time = %f)" % (stored, duplicates, partial, skipped, errors, ttime))
                         except KeyError: # TODO: Again, what error happens here? fix when we find out ..
                             pass
                         self.updatedsize[f] = stat_info.st_size

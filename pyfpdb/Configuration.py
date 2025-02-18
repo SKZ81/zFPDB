@@ -84,7 +84,7 @@ else:
 if INSTALL_METHOD == "exe" or INSTALL_METHOD == "app":
     FPDB_ROOT_PATH = os.path.dirname(sys.executable) # should be exe path to \fpdbroot\pyfpdb
 elif sys.path[0] == "": # we are probably running directly (>>>import Configuration)
-    temp = os.getcwdu() # should be ./pyfpdb
+    temp = os.getcwd() # should be ./pyfpdb
     FPDB_ROOT_PATH = os.path.join(temp, os.pardir)   # go up one level (to fpdbroot)
 else: # all other cases
     FPDB_ROOT_PATH = os.path.dirname(sys.path[0])  # should be source path to /fpdbroot

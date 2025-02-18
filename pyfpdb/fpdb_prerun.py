@@ -114,8 +114,7 @@ class ChooseLanguage:
         win.destroy()
         
     def getLanguage(self):
-        import string
-        return string.split(self.selected_language, " -- ", 1)[0]
+        return self.selected_language.split(" -- ", 1)[0]
 
 #=====================================================================
 

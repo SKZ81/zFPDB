@@ -296,7 +296,7 @@ class fpdb(QMainWindow):
                                   gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT))
                 dia.set_default_size(700, 320)
 
-                prefs = GuiDatabase.GuiDatabase(self.config, self.window, dia)
+                prefs = GuiDatabase.GuiDatabase(self.config, self.centralWidget(), dia)
                 response = dia.run()
                 if response == gtk.RESPONSE_ACCEPT:
                     log.info(_('saving updated db data'))
@@ -631,7 +631,7 @@ class fpdb(QMainWindow):
 
         if viewer is None:
             #print "creating new log viewer"
-            new_thread = GuiLogView.GuiLogView(self.config, self.window, self.closeq)
+            new_thread = GuiLogView.GuiLogView(self.config, self.centralWidget(), self.closeq)
             self.threads.append(new_thread)
         else:
             #print "showing existing log viewer"
@@ -1026,13 +1026,13 @@ class fpdb(QMainWindow):
 
     def tab_tourney_import(self, widget, data=None):
         """opens a tab for bulk importing tournament summaries"""
-        new_import_thread = GuiTourneyImport.GuiTourneyImport(self.settings, self.config, self.sql, self.window)
+        new_import_thread = GuiTourneyImport.GuiTourneyImport(self.settings, self.config, self.sql, self.centralWidget())
         self.threads.append(new_import_thread)
         bulk_tab=new_import_thread.get_vbox()
         self.add_and_display_tab(bulk_tab, _("Tournament Results Import"))
 
     def tab_imap_import(self, widget, data=None):
-        new_thread = GuiImapFetcher.GuiImapFetcher(self.config, self.db, self.sql, self.window)
+        new_thread = GuiImapFetcher.GuiImapFetcher(self.config, self.db, self.sql, self.centralWidget())
         self.threads.append(new_thread)
         tab=new_thread.get_vbox()
         self.add_and_display_tab(tab, _("eMail Import"))
@@ -1049,10 +1049,9 @@ class fpdb(QMainWindow):
         self.add_and_display_tab(new_ps_thread, _("Tourney Stats"))
 
     def tab_tourney_viewer_stats(self, widget, data=None):
-        new_thread = GuiTourneyViewer.GuiTourneyViewer(self.config, self.db, self.sql, self.window)
+        new_thread = GuiTourneyViewer.GuiTourneyViewer(self.config, self.db, self.sql, self.centralWidget())
         self.threads.append(new_thread)
-        tab=new_thread.get_vbox()
-        self.add_and_display_tab(tab, _("Tourney Viewer"))
+        self.add_and_display_tab(new_thread, _("Tourney Viewer"))
 
     def tab_positional_stats(self, widget, data=None):
         new_ps_thread = GuiPositionalStats.GuiPositionalStats(self.config, self.sql)
@@ -1093,7 +1092,7 @@ You can find the full license texts in agpl-3.0.txt, gpl-2.0.txt, gpl-3.0.txt an
 
     def tabGraphViewer(self, widget, data=None):
         """opens a graph viewer tab"""
-        new_gv_thread = GuiGraphViewer.GuiGraphViewer(self.sql, self.config, self)
+        new_gv_thread = GuiGraphViewer.GuiGraphViewer(self.config, self.db, self.sql, self.centralWidget())
         self.threads.append(new_gv_thread)
         self.add_and_display_tab(new_gv_thread, _("Graphs"))
 
@@ -1105,7 +1104,7 @@ You can find the full license texts in agpl-3.0.txt, gpl-2.0.txt, gpl-3.0.txt an
 
     def tabStove(self, widget, data=None):
         """opens a tab for poker stove"""
-        thread = GuiStove.GuiStove(self.config, self.window)
+        thread = GuiStove.GuiStove(self.config, self.centralWidget())
         self.threads.append(thread)
         tab = thread.get_vbox()
         self.add_and_display_tab(tab, _("Stove"))

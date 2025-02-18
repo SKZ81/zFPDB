@@ -74,7 +74,7 @@ class Filters(QWidget):
 
         self.currencyName = {"USD" : _("US Dollar")
                             ,"EUR" : _("Euro")
-                            ,"T$"  : _("Tournament Dollar")
+                            ,"T$"  : _("Tournament Chips")
                             ,"play": _("Play Money")
                             }
 
@@ -420,7 +420,7 @@ class Filters(QWidget):
             hbox.addWidget(lbl)
 
             self.phands = QSpinBox()
-            self.phands.setMaximum(1e5)
+            self.phands.setMaximum(10000)
             hbox.addWidget(self.phands)
 
     def fillSitesFrame(self, frame):
@@ -477,8 +477,8 @@ class Filters(QWidget):
                 hbox.addWidget(btnNone)
                 hbox.addStretch()
         else:
-            print(_("INFO: No games returned from database"))
-            log.info(_("No games returned from database"))
+            print(_("INFO: fillGamesFrame: No games returned from database"))
+            log.info(_("fillGamesFrame: No games returned from database"))
     
     def fillPositionsFrame(self, frame, display):
         vbox1 = QVBoxLayout()
@@ -650,8 +650,8 @@ class Filters(QWidget):
 
                 hbox.addStretch()
         else:
-            print(_("INFO: No games returned from database"))
-            log.info(_("No games returned from database"))
+            print(_("INFO: fillLimitsFrame: No games returned from database"))
+            log.info(_("fillLimitsFrame: No games returned from database"))
 
         if "Type" in display and display["Type"] and 'ring' in types_found and 'tour' in types_found:
             # rb1 = QRadioButton(frame, self.filterText['ring'])
