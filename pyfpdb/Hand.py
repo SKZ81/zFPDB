@@ -453,9 +453,13 @@ class Hand(object):
         # Discripter must be set to lowercase as supported dbs differ on what is returned.
         res = [dict(line) for line in [zip([ column[0].lower() for column in c.description], row) for row in c.fetchall()]]
         res = res[0]
-
+        print(str(res))
         self.tablename = res['tablename']
         self.handid    = res['sitehandno']
+        if res['seats']:
+            self.maxseats  = res['seats']
+        # else: keep default value
+
         # FIXME: Need to figure out why some times come out of the DB as %Y-%m-%d %H:%M:%S+00:00,
         #        and others as %Y-%m-%d %H:%M:%S
         
