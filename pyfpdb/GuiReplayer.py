@@ -224,6 +224,8 @@ class GuiReplayer(QWidget):
     def play_hand(self, handidx):
         self.handidx = handidx
         hand = Hand.hand_factory(self.handlist[handidx], self.conf, self.db)
+        hand.writeHand()
+        print('nb seats:', hand.maxseats)
         # hand.writeHand()  # Print handhistory to stdout -> should be an option in the GUI
         self.currency = hand.sym
 
@@ -249,6 +251,8 @@ class GuiReplayer(QWidget):
         state = copy.deepcopy(state)
         state.endHand(hand.collectees, hand.pot.returned)
         self.states.append(state)
+        for i, s in enumerate(self.states):
+            print("self.states[%d]: %s"%(i, str(s)))
 
         # Clear and repopulate the row of buttons
         for idx in reversed(range(self.buttonBox.count())):
