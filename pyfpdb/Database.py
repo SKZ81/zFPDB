@@ -3119,6 +3119,12 @@ class Database:
         id += self.hand_inc
         return id
 
+    def get_hands_for_tourney(self, tourney_id):
+        c = self.get_cursor(True)
+        q = self.sql.query['handsInTourney']
+        c.execute(q, (tourney_id,))
+        return ["id",], c.fetchall()
+
     def isDuplicate(self, siteId, siteHandNo, heroSeat, publicDB):
         q = self.sql.query['isAlreadyInDB'].replace('%s', self.sql.query['placeholder'])
         if publicDB:
@@ -3249,8 +3255,23 @@ class Database:
             result = tmp[0]
         return result
     
+    def getTourneysFromSites(self, site_ids):
+        self.connection.set_trace_callback(print)
+        c = self.get_cursor()
+        in_p = ', '.join(list(map(lambda x: self.sql.query['placeholder'], site_ids)))
+        q = self.sql.query['selectTourneysFromSites'].replace(self.sql.query['placeholder'], in_p)
+
+        c.execute(q, site_ids)
+        columnNames=c.description
+
+        names=[column[0] for column in columnNames]
+        data=c.fetchall()
+        self.connection.set_trace_callback(None)
+        return (names,data)
+
     def getTourneyInfo(self, siteName, tourneyNo):
         c = self.get_cursor()
+        self.log_queries(c)
         q = self.sql.query['getTourneyInfo'].replace('%s', self.sql.query['placeholder'])
         c.execute(q, (siteName, tourneyNo))
         columnNames=c.description
@@ -3528,7 +3549,10 @@ class Database:
                 #        summary.startTime=resultDict[ev]
             if updateDb:
                 q = self.sql.query['updateTourney'].replace('%s', self.sql.query['placeholder'])
-                row = (summary.entries, summary.prizepool, summary.startTime.replace(tzinfo=None), summary.endTime.replace(tzinfo=None), summary.tourneyName,
+                row = (summary.entries, summary.prizepool,
+                       summary.startTime.replace(tzinfo=None) if summary.startTime else None,
+                       summary.endTime.replace(tzinfo=None) if summary.endTime else None,
+                       summary.tourneyName,
                        summary.totalRebuyCount, summary.totalAddOnCount, summary.comment, summary.commentTs, 
                        summary.added, summary.addedCurrency, tourneyId
                       )

@@ -6035,7 +6035,7 @@ class Sql:
                 ORDER by time"""
 
         ####################################
-        # Querry to get all hands in a date range
+        # Query to get all hands in a date range
         ####################################
         self.query['handsInRange'] = """
             select h.id
@@ -6047,6 +6047,15 @@ class Sql:
                 <game_test>
                 <limit_test>
                 <position_test>"""
+
+        ####################################
+        # Querry to get all hands in a tourney
+        ####################################
+        self.query['handsInTourney'] = """
+            select h.id
+            from Hands h
+            where h.tourneyId = ?
+        """
 
         ####################################
         # Query to get a single hand for the replayer
@@ -8721,7 +8730,25 @@ class Sql:
                                                 WHERE tt.siteId=%s AND t.siteTourneyNo=%s
             """
         
-        self.query['selectTourneyWithTypeId'] = """SELECT id 
+        self.query['selectTourneysFromSites'] = """SELECT t.id,
+                                                          t.siteTourneyNo,
+                                                          t.entries,
+                                                          t.prizepool,
+                                                          t.startTime,
+                                                          t.endTime,
+                                                          t.tourneyName,
+                                                          tt.siteId,
+                                                          tt.currency,
+                                                          tt.buyin,
+                                                          tt.fee,
+                                                          tt.speed
+                                                FROM Tourneys t
+                                                INNER JOIN TourneyTypes tt ON
+                                                (t.tourneyTypeId = tt.id)
+                                                WHERE tt.siteId IN (%s)
+        """
+
+        self.query['selectTourneyWithTypeId'] = """SELECT id
                                                 FROM Tourneys
                                                 WHERE tourneyTypeId = %s
         """
