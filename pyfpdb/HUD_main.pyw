@@ -249,7 +249,7 @@ class HUD_main(QObject):
                 if result:
                     site_id = result[0][0]
                     self.hero[site_id] = self.config.supported_sites[site].screen_name
-                    self.hero_ids[site_id] = self.db_connection.get_player_id(self.config, site, self.hero[site_id])
+                    self.hero_ids[site_id] = self.db_connection.get_player_id(site, self.hero[site_id])
                     if self.hero_ids[site_id] is not None:
                         found = True
                     else:

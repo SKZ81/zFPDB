@@ -405,7 +405,7 @@ class Filters(QWidget):
             self.leHeroes[site] = QLineEdit(_pname)
             vbox.addWidget(self.leHeroes[site])
 
-            names = self.db.get_player_names(self.conf, self.siteid[site])
+            names = self.db.get_player_names(self.siteid[site])
             completer = QCompleter([Charset.to_gui(n[0]) for n in names])
             self.leHeroes[site].setCompleter(completer)
 
@@ -845,7 +845,7 @@ class Filters(QWidget):
             for site in sites:
                 sitenos.append(siteids[site])
                 _hname = Charset.to_utf8(heroes[site])
-                result = self.db.get_player_id(self.conf, site, _hname)
+                result = self.db.get_player_id(site, _hname)
                 if result is not None:
                     playerids.append(str(result))
             

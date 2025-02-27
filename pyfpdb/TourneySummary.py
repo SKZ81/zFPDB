@@ -250,7 +250,7 @@ class TourneySummary(object):
         
         self.playerIds = self.db.getSqlPlayerIDs(self.players.keys(), self.siteId, self.hero)
         #for player in self.players:
-        #    id=self.db.get_player_id(self.config, self.siteName, player)
+        #    id=self.db.get_player_id(self.siteName, player)
         #    if not id:
         #        id=self.db.insertPlayer(unicode(player), self.siteId)
         #    self.playerIds.update({player:id})

@@ -1298,7 +1298,7 @@ class Database:
         #print "session stat_dict =", stat_dict
         #return stat_dict
 
-    def get_player_id(self, config, siteName, playerName):
+    def get_player_id(self, siteName, playerName):
         c = self.connection.cursor()
         #print "db.get_player_id siteName",siteName,"playerName",playerName
         c.execute(self.sql.query['get_player_id'], (playerName, siteName))
@@ -1308,7 +1308,7 @@ class Database:
         else:
             return None
 
-    def get_player_names(self, config, site_id=None, like_player_name="%"):
+    def get_player_names(self, site_id=None, like_player_name="%"):
         """Fetch player names from players. Use site_id and like_player_name if provided"""
 
         if site_id is None:
@@ -2082,7 +2082,7 @@ class Database:
                 if result:
                     site_id = result[0][0]
                     self.hero[site_id] = self.config.supported_sites[site].screen_name
-                    p_id = self.get_player_id(self.config, site, self.hero[site_id])
+                    p_id = self.get_player_id(site, self.hero[site_id])
                     if p_id:
                         self.hero_ids[site_id] = int(p_id)
                         
@@ -2182,7 +2182,7 @@ class Database:
                 if result:
                     site_id = result[0][0]
                     self.hero[site_id] = self.config.supported_sites[site].screen_name
-                    p_id = self.get_player_id(self.config, site, self.hero[site_id])
+                    p_id = self.get_player_id(site, self.hero[site_id])
                     if p_id:
                         self.hero_ids[site_id] = int(p_id)
 

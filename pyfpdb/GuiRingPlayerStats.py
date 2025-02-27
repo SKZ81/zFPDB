@@ -220,7 +220,7 @@ class GuiRingPlayerStats(QSplitter):
         for site in sites:
             sitenos.append(siteids[site])
             _hname = Charset.to_utf8(heroes[site])
-            result = self.db.get_player_id(self.conf, site, _hname)
+            result = self.db.get_player_id(site, _hname)
             if result is not None:
                 playerids.append(int(result))
 

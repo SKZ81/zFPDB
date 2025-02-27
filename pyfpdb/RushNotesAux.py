@@ -107,7 +107,7 @@ class RushNotes(Aux_Window):
         heroname = site_params_dict['screen_name']
         sitename = site_params_dict['site_name']
         notepath = site_params_dict['site_path']  # this is a temporary hijack of site-path
-        self.heroid = self.hud.db_connection.get_player_id(self.config, sitename, heroname)
+        self.heroid = self.hud.db_connection.get_player_id(sitename, heroname)
         self.notefile = notepath + "/" + heroname + ".xml"
         self.rushtables = ("Mach 10", "Lightning", "Celerity", "Flash", "Zoom", "Apollo")
 
