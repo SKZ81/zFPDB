@@ -1300,10 +1300,8 @@ class Database:
 
     def get_player_id(self, config, siteName, playerName):
         c = self.connection.cursor()
-        siteNameUtf = Charset.to_utf8(siteName)
-        playerNameUtf = playerName
         #print "db.get_player_id siteName",siteName,"playerName",playerName
-        c.execute(self.sql.query['get_player_id'], (playerNameUtf, siteNameUtf))
+        c.execute(self.sql.query['get_player_id'], (playerName, siteName))
         row = c.fetchone()
         if row:
             return row[0]
@@ -2324,7 +2322,7 @@ class Database:
             print ("###### End Hands ########")
             
         # Tablename can have odd charachers
-        hdata['tableName'] = Charset.to_db_utf8(hdata['tableName'])
+        # hdata['tableName'] = Charset.to_utf8(hdata['tableName'])
         
         self.hids.append(hdata['id'])
         self.hbulk.append( [ hdata['tableName'],
@@ -3163,15 +3161,14 @@ class Database:
     def insertPlayer(self, name, site_id, hero):
         insert_player = "INSERT INTO Players (name, siteId, hero, chars) VALUES (%s, %s, %s, %s)"
         insert_player = insert_player.replace('%s', self.sql.query['placeholder'])
-        _name = Charset.to_db_utf8(name)
-        if re_char.match(_name[0]):
+        if re_char.match(name[0]):
             char = '123'
-        elif len(_name)==1 or re_char.match(_name[1]):
-            char = _name[0] + '1'
+        elif len(name)==1 or re_char.match(name[1]):
+            char = name[0] + '1'
         else:
-            char = _name[:2]
+            char = name[:2]
         
-        key = (_name, site_id, hero, char.upper())
+        key = (name, site_id, hero, char.upper())
         
         #NOTE/FIXME?: MySQL has ON DUPLICATE KEY UPDATE
         #Usage:
@@ -3359,9 +3356,7 @@ class Database:
                    obj.isGuarantee, obj.guaranteeAmt)
             cursor.execute (self.sql.query['getTourneyTypeId'].replace('%s', self.sql.query['placeholder']), row)
             tmp=cursor.fetchone()
-            try:
-                ttid = tmp[0]
-            except TypeError: #this means we need to create a new entry
+            if tmp is None:
                 if self.printdata:
                     print ("######## Tourneys ##########")
                     import pprint
@@ -3370,6 +3365,8 @@ class Database:
                     print ("###### End Tourneys ########")
                 cursor.execute (self.sql.query['insertTourneyType'].replace('%s', self.sql.query['placeholder']), row)
                 ttid = self.get_last_insert_id(cursor)
+            else:
+                ttid = tmp[0]
             if updateDb:
                 #print 'DEBUG createOrUpdateTourneyType:', 'old', oldttid, 'new', ttid, row
                 q = self.sql.query['updateTourneyTypeId'].replace('%s', self.sql.query['placeholder'])

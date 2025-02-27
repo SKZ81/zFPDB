@@ -111,7 +111,7 @@ class Winamax(HandHistoryConverter):
     re_Mixed        = re.compile(r'_(?P<MIXED>10games|8games|horse)_')
 
     # 2010/09/21 03:10:51 UTC
-    re_DateTime = re.compile("""
+    re_DateTime = re.compile(r"""
             (?P<Y>[0-9]{4})/
             (?P<M>[0-9]+)/
             (?P<D>[0-9]+)\s
@@ -122,12 +122,10 @@ class Winamax(HandHistoryConverter):
 # Seat 1: some_player (5€)
 # Seat 2: some_other_player21 (6.33€)
 
-    re_PlayerInfo        = re.compile(u'Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.*)\s\((%(LS)s)?(?P<PL_STACK>[.0-9]+)(%(LS)s)?(,\s(%(LS)s)?(?P<PL_BOUNTY>[.0-9]+)(%(LS)s)?\sbounty)?\)' % substitutions)
+    re_PlayerInfo        = re.compile(r'Seat\s(?P<SEAT>[0-9]+):\s(?P<PNAME>.*)\s\((%(LS)s)?(?P<PL_STACK>[.0-9]+)(%(LS)s)?(,\s(%(LS)s)?(?P<PL_BOUNTY>[.0-9]+)(%(LS)s)?\sbounty)?\)' % substitutions)
 
     def compilePlayerRegexs(self, hand):
         players = set([player[1] for player in hand.players])
-        print("compilePlayerRegexs: hand plrs " + str(players))
-        print("compilePlayerRegexs: compiled plrs " + str(self.compiledPlayers))
         if not players <= self.compiledPlayers: # x <= y means 'x is subset of y'
             # we need to recompile the player regexs.
             self.compiledPlayers = players
@@ -135,22 +133,22 @@ class Winamax(HandHistoryConverter):
             #helander2222 posts blind ($0.25), lopllopl posts blind ($0.50).
             player_re = "(?P<PNAME>" + "|".join(map(re.escape, players)) + ")"
             subst = {'PLYR': player_re, 'CUR': self.sym[hand.gametype['currency']]}
-            self.re_PostSB    = re.compile('%(PLYR)s posts small blind (%(CUR)s)?(?P<SB>[\.0-9]+)(%(CUR)s)?(?! out of position)' % subst, re.MULTILINE)
-            self.re_PostBB    = re.compile('%(PLYR)s posts big blind (%(CUR)s)?(?P<BB>[\.0-9]+)(%(CUR)s)?' % subst, re.MULTILINE)
-            self.re_DenySB    = re.compile('(?P<PNAME>.*) deny SB' % subst, re.MULTILINE)
+            self.re_PostSB    = re.compile(r'%(PLYR)s posts small blind (%(CUR)s)?(?P<SB>[\.0-9]+)(%(CUR)s)?(?! out of position)' % subst, re.MULTILINE)
+            self.re_PostBB    = re.compile(r'%(PLYR)s posts big blind (%(CUR)s)?(?P<BB>[\.0-9]+)(%(CUR)s)?' % subst, re.MULTILINE)
+            self.re_DenySB    = re.compile(r'(?P<PNAME>.*) deny SB' % subst, re.MULTILINE)
             self.re_Antes     = re.compile(r"^%(PLYR)s posts ante (%(CUR)s)?(?P<ANTE>[\.0-9]+)(%(CUR)s)?" % subst, re.MULTILINE)
             self.re_BringIn   = re.compile(r"^%(PLYR)s brings in (%(CUR)s)?(?P<BRINGIN>[\.0-9]+)(%(CUR)s)?" % subst, re.MULTILINE)
-            self.re_PostBoth  = re.compile('(?P<PNAME>.*): posts small \& big blind \( (%(CUR)s)?(?P<SBBB>[\.0-9]+)(%(CUR)s)?\)' % subst)
-            self.re_PostDead  = re.compile('(?P<PNAME>.*) posts dead blind \((%(CUR)s)?(?P<DEAD>[\.0-9]+)(%(CUR)s)?\)' % subst, re.MULTILINE)
-            self.re_PostSecondSB = re.compile('%(PLYR)s posts small blind (%(CUR)s)?(?P<SB>[\.0-9]+)(%(CUR)s)? out of position' % subst, re.MULTILINE)
-            self.re_HeroCards = re.compile('Dealt\sto\s%(PLYR)s(?: \[(?P<OLDCARDS>.+?)\])?( \[(?P<NEWCARDS>.+?)\])' % subst)
+            self.re_PostBoth  = re.compile(r'(?P<PNAME>.*): posts small \& big blind \( (%(CUR)s)?(?P<SBBB>[\.0-9]+)(%(CUR)s)?\)' % subst)
+            self.re_PostDead  = re.compile(r'(?P<PNAME>.*) posts dead blind \((%(CUR)s)?(?P<DEAD>[\.0-9]+)(%(CUR)s)?\)' % subst, re.MULTILINE)
+            self.re_PostSecondSB = re.compile(r'%(PLYR)s posts small blind (%(CUR)s)?(?P<SB>[\.0-9]+)(%(CUR)s)? out of position' % subst, re.MULTILINE)
+            self.re_HeroCards = re.compile(r'Dealt\sto\s%(PLYR)s(?: \[(?P<OLDCARDS>.+?)\])?( \[(?P<NEWCARDS>.+?)\])' % subst)
 
             # no discards action observed yet
-            self.re_Action = re.compile('(, )?(?P<PNAME>.*?)(?P<ATYPE> bets| checks| raises| calls| folds| stands\spat)( \-?(%(CUR)s)?(?P<BET>[\d\.]+)(%(CUR)s)?)?( to (%(CUR)s)?(?P<BETTO>[\d\.]+)(%(CUR)s)?)?( and is all-in)?' % subst)
-            self.re_ShowdownAction = re.compile('(?P<PNAME>[^\(\)\n]*) (\((small blind|big blind|button)\) )?shows \[(?P<CARDS>.+)\]')
+            self.re_Action = re.compile(r'(, )?(?P<PNAME>.*?)(?P<ATYPE> bets| checks| raises| calls| folds| stands\spat)( \-?(%(CUR)s)?(?P<BET>[\d\.]+)(%(CUR)s)?)?( to (%(CUR)s)?(?P<BETTO>[\d\.]+)(%(CUR)s)?)?( and is all-in)?' % subst)
+            self.re_ShowdownAction = re.compile(r'(?P<PNAME>[^\(\)\n]*) (\((small blind|big blind|button)\) )?shows \[(?P<CARDS>.+)\]')
 
-            self.re_CollectPot = re.compile('\s*(?P<PNAME>.*)\scollected\s(%(CUR)s)?(?P<POT>[\.\d]+)(%(CUR)s)?.*' % subst)
-            self.re_ShownCards = re.compile("^Seat (?P<SEAT>[0-9]+): %(PLYR)s (\((small blind|big blind|button)\) )?showed \[(?P<CARDS>.*)\].+? with (?P<STRING>.*)" % subst, re.MULTILINE)
+            self.re_CollectPot = re.compile(r'\s*(?P<PNAME>.*)\scollected\s(%(CUR)s)?(?P<POT>[\.\d]+)(%(CUR)s)?.*' % subst)
+            self.re_ShownCards = re.compile(r"^Seat (?P<SEAT>[0-9]+): %(PLYR)s (\((small blind|big blind|button)\) )?showed \[(?P<CARDS>.*)\].+? with (?P<STRING>.*)" % subst, re.MULTILINE)
             log.info(_("WinamaxToFpdb recompiled parsing regexp for new player list."))
 
     def readSupportedGames(self):
@@ -187,9 +185,7 @@ class Winamax(HandHistoryConverter):
             tmp = handText[0:200]
             log.error(_("WinamaxToFpdb.determineGameType: '%s'") % tmp)
             raise FpdbParseError
-
         mg = m.groupdict()
-        # print("HandInfo parsed: " + str(mg))
 
         if mg.get('TOUR'):
             info['type'] = 'tour'
@@ -233,81 +229,78 @@ class Winamax(HandHistoryConverter):
             raise FpdbParseError
 
         info.update(m.groupdict())
-        #log.debug("readHandInfo: %s" % info)
-        for key in info:
-            if key == 'DATETIME':
-                a = self.re_DateTime.search(info[key])
-                if a:
-                    datetimestr = "%s/%s/%s %s:%s:%s" % (a.group('Y'),a.group('M'), a.group('D'), a.group('H'),a.group('MIN'),a.group('S'))
-                else:
-                    datetimestr = "2010/Jan/01 01:01:01"
-                    log.error("readHandInfo: " + _("DATETIME not matched: '%s'") % info[key])
-                    #print "DEBUG: readHandInfo: DATETIME not matched: '%s'" % info[key]
-                hand.startTime = datetime.datetime.strptime(datetimestr, "%Y/%m/%d %H:%M:%S")
-            if key == 'HID1':
-                # Need to remove non-alphanumerics for MySQL
-                # Concatenating all three or just HID2 + HID3 can produce out of range values
-                # HID should not be greater than 14 characters to ensure this
-                hand.handid = "%s%s" % (int(info['HID1'][:14]), int(info['HID2']))
-                    
-#            if key == 'HID3':
-#                hand.handid = int(info['HID3'])   # correct hand no (REB)
-            if key == 'TOURNO':
-                hand.tourNo = info[key]
-            if key == 'TABLE':
-                hand.tablename = info[key]
-                if hand.gametype['type'] == 'tour':
-                    hand.tablename = info['TABLENO']
-                    hand.roundPenny = True
-                # TODO: long-term solution for table naming on Winamax.
-                if hand.tablename.endswith(u'No Limit Hold\'em'):
-                    hand.tablename = hand.tablename[:-len(u'No Limit Hold\'em')] + u'NLHE'
-            if key == 'MAXPLAYER' and info[key] != None:
-                hand.maxseats = int(info[key])
+        if info['DATETIME'] is not None:
+            a = self.re_DateTime.search(info['DATETIME'])
+            if a:
+                datetimestr = "%s/%s/%s %s:%s:%s" % (a.group('Y'),a.group('M'), a.group('D'), a.group('H'),a.group('MIN'),a.group('S'))
+            else:
+                datetimestr = "2010/Jan/01 01:01:01"
+                log.error("readHandInfo: " + _("DATETIME not matched: '%s'") % info['DATETIME'])
+                #print "DEBUG: readHandInfo: DATETIME not matched: '%s'" % info['DATETIME']
+            hand.startTime = datetime.datetime.strptime(datetimestr, "%Y/%m/%d %H:%M:%S")
+        if info['HID1'] is not None:
+            # Need to remove non-alphanumerics for MySQL
+            # Concatenating all three or just HID2 + HID3 can produce out of range values
+            # HID should not be greater than 14 characters to ensure this
+            hand.handid = "%s%s" % (int(info['HID1'][:14]), int(info['HID2']))
 
-            if key == 'BUYIN':
-                if hand.tourNo is not None:
-                    for k in ['BIAMT','BIBOUNTY', 'BIRAKE']:
-                        if k in info.keys() and info[k]:
-                            info[k] = info[k].replace(',','.')
+        if info['HID3'] is not None:
+            hand.handid = int(info['HID3'])   # correct hand no (REB)
+        if info['TOURNO'] is not None:
+            hand.tourNo = info['TOURNO']
+        if info['TABLE'] is not None:
+            hand.tablename = info['TABLE']
+            if hand.gametype['type'] == 'tour':
+                hand.tablename = info['TABLENO']
+                hand.rondPenny = True
+            # TODO: long-term solution for table naming on Winamax.
+            if hand.tablename.endswith(u'No Limit Hold\'em'):
+                hand.tablename = hand.tablename[:-len(u'No Limit Hold\'em')] + u'NLHE'
+        if info['MAXPLAYER'] is not None:
+            hand.maxseats = int(info['MAXPLAYER'])
 
-                    if info[key].find("$")!=-1:
-                        hand.buyinCurrency="USD"
-                    elif info[key].find(u"€")!=-1:
-                        hand.buyinCurrency="EUR"
-                    elif info['MONEY']:
-                        hand.buyinCurrency="EUR"
-                    else:
-                        hand.buyinCurrency="play"
+        if info['BUYIN'] is not None:
+            for k in ['BIAMT','BIBOUNTY', 'BIRAKE']:
+                if k in info.keys() and info[k]:
+                    info[k] = info[k].replace(',','.')
 
-                    if info['BIAMT'] is not None:
-                        info['BIAMT'] = info['BIAMT'].strip(u'$€FPP')
-                    else:
-                        info['BIAMT'] = 0
+            if info['BUYIN'].find("$")!=-1:
+                hand.buyinCurrency="USD"
+            elif info['BUYIN'].find(u"€")!=-1:
+                hand.buyinCurrency="EUR"
+            elif info['MONEY']:
+                hand.buyinCurrency="EUR"
+            else:
+                hand.buyinCurrency="play"
 
-                    if info['BIBOUNTY'] is not None:
-                        info['BIBOUNTY'] = info['BIBOUNTY'].strip(u'$€') # Strip here where it isn't 'None'
-                        #NOTE: This implies we shall find PL_BOUNTY when reading player stacks
-                        hand.isKO = True
-                    else:
-                        info['BIBOUNTY'] = 0
-                        hand.isKO = False
+            if info['BIAMT'] is not None:
+                info['BIAMT'] = info['BIAMT'].strip(u'$€FPP')
+            else:
+                info['BIAMT'] = 0
 
-                    if info['BIBOUNTY'] is not None:
-                        info['BIRAKE'] = info['BIRAKE'].strip(u'$€')
-                    else:
-                        nfo['BIRAKE'] = 0
+            if info['BIBOUNTY'] is not None:
+                info['BIBOUNTY'] = info['BIBOUNTY'].strip(u'$€') # Strip here where it isn't 'None'
+                #NOTE: This implies we shall find PL_BOUNTY when reading player stacks
+                hand.isKO = True
+            else:
+                info['BIBOUNTY'] = 0
+                hand.isKO = False
 
-                # if and.buyinCurrency != "play": # may be useful, depends what other site parsers are doing
-                hand.buyin = int(100 * Decimal(info['BIAMT']))
-                hand.bounty = int(100 * Decimal(info['BIBOUNTY']))
-                hand.fee = int(100 * Decimal(info['BIRAKE']))
+            if info['BIBOUNTY'] is not None:
+                info['BIRAKE'] = info['BIRAKE'].strip(u'$€')
+            else:
+                info['BIRAKE'] = 0
 
-                if hand.buyin == 0 and hand.fee == 0:
-                    hand.buyinCurrency = "FREE"
+            # if and.buyinCurrency != "play": # may be useful, depends what other site parsers are doing
+            hand.buyin = int(100 * Decimal(info['BIAMT']))
+            hand.bounty = int(100 * Decimal(info['BIBOUNTY']))
+            hand.fee = int(100 * Decimal(info['BIRAKE']))
 
-            if key == 'LEVEL':
-                hand.level = info[key]
+            if hand.buyin == 0 and hand.fee == 0:
+                hand.buyinCurrency = "FREE"
+
+        if info['LEVEL'] is not None:
+            hand.level = info['LEVEL']
 
         hand.mixed = None
 
@@ -350,8 +343,6 @@ class Winamax(HandHistoryConverter):
 
         try:
             hand.addStreets(m)
-#            print "adding street", m.group(0)
-#            print "---"
         except:
             log.info(_("Failed to add streets. handtext=%s"))
 
@@ -380,7 +371,6 @@ class Winamax(HandHistoryConverter):
             hand.setCommunityCards(street, m.group('CARDS').split(' '))
 
     def readBlinds(self, hand):
-        print("readBlind: " + hand.handText)
         if not self.re_DenySB.search(hand.handText):
             try:
                 m = self.re_PostSB.search(hand.handText)
@@ -548,7 +538,7 @@ class Winamax(HandHistoryConverter):
         log.info("Winamax.getTableTitleRe: table_name='%s' tournament='%s' table_number='%s'" % (table_name, tournament, table_number))
         regex = "%s /" % (table_name)
         if tournament:
-            regex = "\(%s\)#(%s|%02d|%03d|%04d|%05d)" % (tournament, table_number, int(table_number), int(table_number), int(table_number), int(table_number))
+            regex = r"\(%s\)#(%s|%02d|%03d|%04d|%05d)" % (tournament, table_number, int(table_number), int(table_number), int(table_number), int(table_number))
         log.info("Winamax.getTableTitleRe: returns: '%s'" % (regex))
         return regex
 

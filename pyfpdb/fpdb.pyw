@@ -279,7 +279,7 @@ class fpdb(QMainWindow):
         #force reload of prefs from xml file - needed because HUD could
         #have changed file contents
         self.load_profile()
-        if GuiPrefs.GuiPrefs(self.config, self).exec_():
+        if GuiPrefs.GuiPrefs(self.config, self).exec():
             # save updated config
             self.config.save()
             self.reload_config()
@@ -493,11 +493,11 @@ class fpdb(QMainWindow):
             dia.layout().addWidget(checkboxes[game])
             if game in filters:
                 checkboxes[game].setChecked(True)
-        btns = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         dia.layout().addWidget(btns)
         btns.accepted.connect(dia.accept)
         btns.rejected.connect(dia.reject)
-        if dia.exec_():
+        if dia.exec():
             filterGames = []
             for game, cb in checkboxes.items():
                 if cb.isChecked():
@@ -517,14 +517,14 @@ class fpdb(QMainWindow):
     def dia_recreate_tables(self, widget, data=None):
         """Dialogue that asks user to confirm that he wants to delete and recreate the tables"""
         if self.obtain_global_lock("fpdb.dia_recreate_tables"):  # returns true if successful
-            dia_confirm = QMessageBox(QMessageBox.Warning, "Wipe DB", _("Confirm deleting and recreating tables"), QMessageBox.Yes | QMessageBox.No, self)
+            dia_confirm = QMessageBox(QMessageBox.Icon.Warning, "Wipe DB", _("Confirm deleting and recreating tables"), QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, self)
             diastring = _("Please confirm that you want to (re-)create the tables.") \
                         + " " + (_("If there already are tables in the database %s on %s they will be deleted and you will have to re-import your histories.") % (self.db.database, self.db.host)) + "\n"\
                         + _("This may take a while.")
             dia_confirm.setInformativeText(diastring)  # todo: make above string with bold for db, host and deleted
-            response = dia_confirm.exec_()
+            response = dia_confirm.exec()
 
-            if response == QMessageBox.Yes:
+            if response == QMessageBox.StandardButton.Yes:
                 self.db.recreate_tables()
                 # find any guibulkimport/guiautoimport windows and clear cache:
                 for t in self.threads:
@@ -573,7 +573,7 @@ class fpdb(QMainWindow):
             btns.accepted.connect(self.dia_confirm.accept)
             btns.rejected.connect(self.dia_confirm.reject)
 
-            response = self.dia_confirm.exec_()
+            response = self.dia_confirm.exec()
             if response:
                 print(_(" Rebuilding HUD Cache ... "))
 
@@ -587,16 +587,16 @@ class fpdb(QMainWindow):
 
     def dia_rebuild_indexes(self, widget, data=None):
         if self.obtain_global_lock("dia_rebuild_indexes"):
-            self.dia_confirm = QMessageBox(QMessageBox.Warning,
+            self.dia_confirm = QMessageBox(QMessageBox.Icon.Warning,
                                            "Rebuild DB",
                                            _("Confirm rebuilding database indexes"),
-                                           QMessageBox.Yes | QMessageBox.No,
+                                           QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                                            self)
             diastring = _("Please confirm that you want to rebuild the database indexes.")
             self.dia_confirm.setInformativeText(diastring)
 
-            response = self.dia_confirm.exec_()
-            if response == QMessageBox.Yes:
+            response = self.dia_confirm.exec()
+            if response == QMessageBox.StandardButton.Yes:
                 print(_(" Rebuilding Indexes ... "))
                 self.db.rebuild_indexes()
 
@@ -715,12 +715,12 @@ class fpdb(QMainWindow):
                 button.clicked.connect(partial(self.detect_clicked, data=(detector, available_site_names[site_number], screen_names[site_number], history_paths[site_number], summary_paths[site_number])))
             y_pos+=1
 
-        btns = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel, dia)
+        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel, dia)
         btns.accepted.connect(dia.accept)
         btns.rejected.connect(dia.reject)
         dia.layout().addWidget(btns)
 
-        response = dia.exec_()
+        response = dia.exec()
         if response:
             for site_number in range(0, len(available_site_names)):
                 #print "site %s enabled=%s name=%s" % (available_site_names[site_number], check_buttons[site_number].get_active(), screen_names[site_number].get_text(), history_paths[site_number].get_text())
@@ -794,7 +794,7 @@ class fpdb(QMainWindow):
 
         vb.addWidget(btn)
 
-        d.exec_()
+        d.exec()
         return
 
     def __get_dates(self):
@@ -905,11 +905,11 @@ class fpdb(QMainWindow):
             label = QLabel(_("See the release note for information about the edits needed"))
             diaConfigVersionWarning.layout().addWidget(label)
 
-            btns = QDialogButtonBox(QDialogButtonBox.Ok)
+            btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
             btns.accepted.connect(diaConfigVersionWarning.accept)
             diaConfigVersionWarning.layout().addWidget(btns)
 
-            diaConfigVersionWarning.exec_()
+            diaConfigVersionWarning.exec()
             self.config.wrongConfigVersion = False
             
         self.settings = {}
@@ -951,10 +951,10 @@ class fpdb(QMainWindow):
             self.db = None
 
         if self.db is not None and self.db.wrongDbVersion:
-            diaDbVersionWarning = QMessageBox(QMessageBox.Warning, _("Strong Warning - Invalid database version"), _("An invalid DB version or missing tables have been detected."), QMessageBox.Ok, self)
+            diaDbVersionWarning = QMessageBox(QMessageBox.Icon.Warning, _("Strong Warning - Invalid database version"), _("An invalid DB version or missing tables have been detected."), QMessageBox.StandardButton.Ok, self)
             diaDbVersionWarning.setInformativeText(_("This error is not necessarily fatal but it is strongly recommended that you recreate the tables by using the Database menu.")
                                                    + "\n" +  _("Not doing this will likely lead to misbehaviour including fpdb crashes, corrupt data etc."))
-            diaDbVersionWarning.exec_()
+            diaDbVersionWarning.exec()
         if self.db is not None and self.db.is_connected():
             self.statusBar().showMessage(_("Status: Connected to %s database named %s on host %s")
                                      % (self.db.get_backend_name(), self.db.database, self.db.host))
@@ -1098,7 +1098,7 @@ You can find the full license texts in agpl-3.0.txt, gpl-2.0.txt, gpl-3.0.txt an
 
     def tabTourneyGraphViewer(self, widget, data=None):
         """opens a graph viewer tab"""
-        new_gv_thread = GuiTourneyGraphViewer.GuiTourneyGraphViewer(self.sql, self.config, self)
+        new_gv_thread = GuiTourneyGraphViewer.GuiTourneyGraphViewer(self.config, self.db, self.sql, self)
         self.threads.append(new_gv_thread)
         self.add_and_display_tab(new_gv_thread, _("Tourney Graphs"))
 
@@ -1292,10 +1292,10 @@ You can find the full license texts in agpl-3.0.txt, gpl-2.0.txt, gpl-3.0.txt an
         diapath = QMessageBox(self)
         diapath.setWindowTitle(str1)
         diapath.setText(str2)
-        return diapath.exec_()
+        return diapath.exec()
 
     def warning_box(self, string, diatitle=_("FPDB WARNING")):
-        return QMessageBox(QMessageBox.Warning, diatitle, string).exec_()
+        return QMessageBox(QMessageBox.Icon.Warning, diatitle, string).exec()
 
     def validate_config(self):
         # check if sites in config file are in DB

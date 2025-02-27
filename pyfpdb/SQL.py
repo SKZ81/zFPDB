@@ -1448,7 +1448,7 @@ class Sql:
                         streetId SMALLINT,
                         boardId SMALLINT,
                         hiLo char(1) NOT NULL,
-                        rankId SMALLINT UNSIGNED NOT NULL, FOREIGN KEY (rankId) REFERENCES Rank(id),
+                        rankId SMALLINT UNSIGNED NOT NULL, FOREIGN KEY (rankId) REFERENCES `Rank`(id),
                         value BIGINT,
                         cards VARCHAR(5),
                         ev NUMERIC)

@@ -111,8 +111,7 @@ class Filters(QWidget):
 
         for site in self.conf.get_supported_sites():
             # Get db site id for filtering later
-            self.cursor.execute(self.sql.query['getSiteId'], (site,))
-            result = self.db.cursor.fetchall()
+            result = self.db.get_site_id(site)
             if len(result) == 1:
                 self.siteid[site] = result[0][0]
             else:
@@ -294,13 +293,13 @@ class Filters(QWidget):
     def getDates(self):
         # self.day_start gives user's start of day in hours
         offset = int(self.day_start * 3600)   # calc day_start in seconds
-
-        t1 = self.start_date.date()
-        t2 = self.end_date.date()
-
-        adj_t1 = QDateTime(t1).addSecs(offset)
-        adj_t2 = QDateTime(t2).addSecs(offset + 24 * 3600 - 1)
-
+        #TODO: check it's ok to add as much as 48h span here...
+        adj_t1 = QDateTime()
+        adj_t1.setDate(self.start_date.date())
+        adj_t1.addSecs(offset)
+        adj_t2 = QDateTime()
+        adj_t2.setDate(self.end_date.date())
+        adj_t2.addSecs(offset + 24 * 3600 - 1)
         return (adj_t1.toUTC().toString("yyyy-MM-dd HH:mm:ss"), adj_t2.toUTC().toString("yyyy-MM-dd HH:mm:ss"))
 
     def registerButton1Name(self, title):

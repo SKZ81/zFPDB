@@ -66,7 +66,7 @@ class GuiPrefs(QDialog):
         self.configView.resizeColumnToContents(0)
 
         self.configView.itemChanged.connect(self.updateConf)
-        btns = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel, self)
+        btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel, self)
         btns.accepted.connect(self.accept)
         btns.rejected.connect(self.reject)
         self.layout().addWidget(btns)

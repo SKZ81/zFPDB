@@ -94,7 +94,7 @@ class GuiTourneyListViewer(GuiTourneyViewer):
                 }
 
     def refreshTourneyList(self):
-        site_ids = [self.conf.get_site_id(site_name) for site_name, cbSite in self.filters.cbSites.items() if cbSite.isChecked()]
+        site_ids = [self.conf.get_site_id(site_name) for site_name in self.filters.getSites()]
         column_names, tourneys = self.db.getTourneysFromSites(site_ids)
         for tourney in tourneys:
             modelrow = [QStandardItem(str(r)) for r in tourney]

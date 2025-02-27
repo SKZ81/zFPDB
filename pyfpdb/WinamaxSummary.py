@@ -20,7 +20,6 @@ _ = L10n.get_translation()
 
 from decimal_wrapper import Decimal
 import datetime
-from bs4 import BeautifulSoup
 
 from Exceptions import FpdbParseError
 from HandHistoryConverter import *
@@ -45,7 +44,7 @@ class WinamaxSummary(TourneySummary):
 
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",     # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|" # legal currency symbols
+                            'LS' : r"\$|\xe2\x82\xac|\u20ac" # legal currency symbols
                     }
     
     re_Identify = re.compile(u"Winamax\sPoker\s\-\sTournament\ssummary")
@@ -80,103 +79,9 @@ class WinamaxSummary(TourneySummary):
 
     @staticmethod
     def getSplitRe(self, head):
-        # re_SplitTourneys = re.compile("Winamax\sPoker\s-\sTournament\ssummary")
-        # m = re.search("<!DOCTYPE html PUBLIC", head)
-        # if m != None:
-        #     self.hhtype = "html"
-        # else:
-        #     self.hhtype = "summary"
         return self.re_Identify
 
     def parseSummary(self):
-        # if self.hhtype == "summary":
-        self.parseSummaryFile()
-        # elif self.hhtype == "html":
-        #     self.parseSummaryHtml()
-
-#     def parseSummaryHtml(self):
-#         self.currency = "EUR"
-#         soup = BeautifulSoup(self.summaryText)
-#         tl = soup.findAll('div', {"class":"left_content"})
-#
-#         ps = soup.findAll('p', {"class": "text"})
-#         for p in ps:
-#             for m in self.re_Details.finditer(str(p)):
-#                 mg = m.groupdict()
-#                 #print mg
-#                 if mg['LABEL'] == 'Buy-in':
-#                     mg['VALUE'] = mg['VALUE'].replace(u"&euro;", "")
-#                     mg['VALUE'] = mg['VALUE'].replace(u"+", "")
-#                     mg['VALUE'] = mg['VALUE'].strip(" $")
-#                     bi, fee = mg['VALUE'].split(" ")
-#                     self.buyin = int(100*Decimal(bi))
-#                     self.fee   = int(100*Decimal(fee))
-#                     #print "DEBUG: bi: '%s' fee: '%s" % (self.buyin, self.fee)
-#                 if mg['LABEL'] == 'Nombre de joueurs inscrits':
-#                     self.entries   = mg['VALUE']
-#                 if mg['LABEL'] == 'D\xc3\xa9but du tournoi':
-#                     self.startTime = datetime.datetime.strptime(mg['VALUE'], "%d-%m-%Y %H:%M")
-#                 if mg['LABEL'] == 'Nombre de joueurs max':
-#                     # Max seats i think
-#                     pass
-#
-#         div = soup.findAll('div', {"class": "title2"})
-#         for m in self.re_Prizepool.finditer(str(div)):
-#             mg = m.groupdict()
-#             #print mg
-#             self.prizepool = mg['PRIZEPOOL'].replace(u',','.')
-#
-#
-#         for m in self.re_GameType.finditer(str(tl[0])):
-#             mg = m.groupdict()
-#             #print mg
-#             self.gametype['limitType'] = self.limits[mg['LIMIT']]
-#             self.gametype['category'] = self.games[mg['GAME']][1]
-#         else:
-#             #FIXME: No gametype
-#             #       Quitte or Double, Starting Block Winamax Poker Tour
-#             #       Do not contain enough the gametype.
-#             # Lookup the tid from the db, if it exists get the gametype info from there, otherwise ParseError
-#             log.warning(_("WinamaxSummary.parseSummary: Gametype unknown defaulting to NLHE"))
-#             self.gametype['limitType'] = 'nl'
-#             self.gametype['category'] = 'holdem'
-#
-#         for m in self.re_Player.finditer(str(tl[0])):
-#             winnings = 0
-#             mg = m.groupdict()
-#             rank     = mg['RANK']
-#             name     = mg['PNAME']
-#             if rank!='...':
-#                 rank = int(mg['RANK'])
-#                 #print "DEUBG: mg: '%s'" % mg
-#                 is_satellite = self.re_Ticket.search(mg['WINNINGS'])
-#                 if is_satellite:
-#                     # Ticket
-#                     if is_satellite.group('VALUE'):
-#                         winnings = self.convert_to_decimal(is_satellite.group('VALUE'))
-#                     else: # Value not specified
-#                         rank = 1
-#                         # FIXME: Do lookup here
-#                         # Tremplin Winamax Poker Tour
-#                         # Starting Block Winamax Poker Tour
-#                         pass
-#                     # For stallites, any ticket means 1st
-#                     if winnings > 0:
-#                         rank = 1
-#                 else:
-#                     winnings = self.convert_to_decimal(mg['WINNINGS'])
-#
-#                 winnings = int(100*Decimal(winnings))
-#                 #print "DEBUG: %s) %s: %s"  %(rank, name, winnings)
-#                 self.addPlayer(rank, name, winnings, self.currency, None, None, None)
-#
-#
-#         for m in self.re_TourNo.finditer(self.summaryText):
-#             mg = m.groupdict()
-#             #print mg
-#             self.tourNo = mg['TOURNO']
-
-    def parseSummaryFile(self):
         m = self.re_SummaryTourneyInfo.search(self.summaryText)
         if m == None:
             tmp = self.summaryText[0:200]
@@ -184,7 +89,6 @@ class WinamaxSummary(TourneySummary):
             raise FpdbParseError
 
         mg = m.groupdict()
-        print("DEBUG: m.groupdict(): %s" % m.groupdict())
 
         if 'ENTRIES' in mg:
             self.entries   = mg['ENTRIES']

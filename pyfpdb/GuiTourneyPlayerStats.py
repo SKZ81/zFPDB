@@ -24,7 +24,7 @@ from time import time, strftime
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import (QStandardItem, QStandardItemModel)
 from PyQt6.QtWidgets import (QFrame, QScrollArea, QSplitter,
-                             QTableView, QVBoxLayout)
+                             QTableView, QVBoxLayout, QMessageBox)
 
 import Charset
 import Filters
@@ -199,11 +199,14 @@ class GuiTourneyPlayerStats(QSplitter):
                 playerids.append(int(result))
 
         if not sitenos:
-            #Should probably pop up here.
-            print(_("No sites selected - defaulting to PokerStars"))
-            sitenos = [2]
+            warningStr = _("No sites selected, please selct one")
+            QMessageBox(QMessageBox.Icon.Warning, "Warning", warningStr, QMessageBox.StandardButton.Ok, self).exec()
+            print("Warning: ", warningStr)
+            return
         if not playerids:
-            print(_("No player ids found"))
+            warningStr = _("No player ids found")
+            QMessageBox(QMessageBox.Icon.Warning, "Warning", warningStr, QMessageBox.StandardButton.Ok, self).exec()
+            print("Warning: ", warningStr)
             return
         
         self.createStatsTable(vbox, tourneyTypes, playerids, sitenos, seats)
