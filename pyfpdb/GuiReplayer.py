@@ -22,6 +22,7 @@ import L10n
 _ = L10n.get_translation()
 
 from functools import partial
+from dataclasses import dataclass
 
 import Hand
 import Card
@@ -46,6 +47,14 @@ CARD_HEIGHT = 42
 CARD_WIDTH = 30
 
 class GuiReplayer(QWidget):
+    chip_colors = {
+        "green": 25,
+        "black": 100,
+        "purple": 500,
+        "yellow": 1000,
+        "cyan": 5000
+    }
+
     """A Replayer to replay hands."""
     def __init__(self, config, querylist, mainwin, handlist):
         QWidget.__init__(self, None)
@@ -72,6 +81,8 @@ class GuiReplayer(QWidget):
                 index = Card.cardFromValueSuit(ranks[j], suits[i])
                 self.cardImages[index] = self.deck_inst.card(suits[i], ranks[j])
         self.cardImages[0] = self.deck_inst.back()
+
+        GfxChipStack.init_chips_collection(self.conf.graphics_path, self.chip_colors)
 
         self.setFixedSize(self.tableImage.width(), self.tableImage.height())
         self.setWindowTitle("FPDB Hand Replayer")
@@ -179,21 +190,19 @@ class GuiReplayer(QWidget):
                     Qt.AlignmentFlag.AlignCenter, str(player.bounty))
 
             if player.bet != 0:
-                painter.drawText(QRect(convertx(player.x * .65) - 100,
-                                         converty(player.y * 0.65),
-                                         200,
-                                         20),
-                                     Qt.AlignmentFlag.AlignCenter,
-                                     '%s%.2f' % (self.currency, player.bet))
+                GfxChipStack(int(player.bet), 6, self.currency).draw(
+                    painter,
+                    convertx(player.x * 0.65),
+                    converty(player.y * 0.65),
+                    align_Hcenter=True)
 
         painter.setPen(Qt.GlobalColor.white)
         if state.pot > 0:
-            painter.drawText(QRect(self.tableImage.width() // 2 - 100,
-                                   self.tableImage.height() // 2 - 20,
-                                   200,
-                                   40),
-                             Qt.AlignmentFlag.AlignCenter,
-                             '%s%.2f' % (self.currency, state.pot))
+            GfxChipStack(int(state.pot), 10, self.currency).draw(
+                painter,
+                self.tableImage.width() // 2,
+                self.tableImage.height() // 2 + 10,
+                align_Hcenter=True)
 
         for street in state.renderBoard:
             x = communityLeft
@@ -339,6 +348,93 @@ class GuiReplayer(QWidget):
             if state.street == street:
                 self.stateSlider.setValue(i)
                 break
+
+
+class GfxChipStack:
+    GFXCHIP_WIDTH = 35
+    GFXCHIP_HEIGHT = 28
+    GFXCHIP_OVERLAP = 8  # Vertical offset for stacking
+    SPACING_PX = 10
+
+    @dataclass
+    class GfxChip:
+        color: str
+        value: int
+        image: QImage
+
+    chips_collection = {}
+    @staticmethod
+    def init_chips_collection(gfx_path: str, collection_descr: dict[str, int]):
+        def loadGfxChip(color: str, value: int):
+            file_path = os.path.join(gfx_path,
+                                    "chips",
+                                    f"{color}.png")
+            if not os.path.exists(file_path):
+                print(f"Error: Image file '{file_path}' not found.")
+                img = QImage()  # Returns an empty QImage if the file is missing
+            else:
+                img = QImage(file_path)
+                if img.isNull():
+                    print(f"Error: Failed to load image '{file_path}' as QImage.")
+                    img = QImage()
+            return GfxChipStack.GfxChip(color, value, img)
+
+        GfxChipStack.chips_collection = [loadGfxChip(color, value)
+                                            for color, value in collection_descr.items()]
+
+    #TODO : support cash game (fractionary values)
+    def __init__(self, amount: int, maxChipsInPile, currency) -> None:
+        #TODO : better decimal management
+        self.currency = currency
+        self.amount = amount
+        # List of columns, each column is a list of (chip_image, y_offset)
+        self.columns = []
+
+        # Breakdown amount into distribution of chips for a given amount.
+        sorted_chips = sorted(self.chips_collection, key=lambda chip: chip.value, reverse=True)
+        chips_per_value = [0] * len(sorted_chips)  # Initialize array to store chip counts
+
+        for i, chip in enumerate(sorted_chips):
+            if amount <= 0:
+                break  # Stop if nothing remains to be divided
+            chips_per_value[i] = amount // chip.value  # Number of this chip needed
+            amount %= chip.value  # Remaining amount to be distributed
+
+        # Piles chips into columns.
+        for count, chip in zip(chips_per_value, sorted_chips):
+            while count > 0:
+                if not self.columns or len(self.columns[-1]) >= maxChipsInPile:
+                    # Create a new column if needed
+                    self.columns.append([])
+
+                available_space = maxChipsInPile - len(self.columns[-1])
+                to_place = min(count, available_space)
+
+                # Add chips to the current column
+                for _ in range(to_place):
+                    self.columns[-1].append((chip.color,
+                                            chip.image,
+                                            -1 * (len(self.columns[-1]) * self.GFXCHIP_OVERLAP)))
+                count -= to_place
+
+    def draw(self, painter: QPainter, x: int, y: int, align_Hcenter = False) -> None:
+        text = '%s%.2f' % (self.currency, self.amount)
+        textRect = QFontMetrics(painter.font()).boundingRect(text)
+        if align_Hcenter:
+            x -= (self.SPACING_PX + textRect.width() + len(self.columns) * self.GFXCHIP_WIDTH) // 2
+
+        # Draw chips and compute total width
+        for i, column in enumerate(self.columns):
+            col_x = i * self.GFXCHIP_WIDTH
+            for color, img, img_y in column:
+                painter.drawImage(x+col_x, y+img_y-self.GFXCHIP_HEIGHT, img)
+
+        # Write text
+        painter.drawText(x + self.SPACING_PX + len(self.columns) * self.GFXCHIP_WIDTH,
+                         y,
+                         text)
+
+
 
 # ICM code originally grabbed from http://svn.gna.org/svn/pokersource/trunk/icm-calculator/icm-webservice.py
 # Copyright (c) 2008 Thomas Johnson <tomfmason@gmail.com>
