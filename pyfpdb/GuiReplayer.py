@@ -259,14 +259,19 @@ class GuiReplayer(QWidget):
             state.startPhase(street)
             self.states.append(state)
             for action in hand.actions[street]:
-                state = copy.deepcopy(state)
-                state.updateForAction(action)
-                self.states.append(state)
+                if street in ("BLINDSANTES", "DEAL") and TableState.AGGREGATE_ANTE:
+                    # Aggregate all blins / ante actions in one single step
+                    state.updateForAction(action)
+                else:
+                    # One replay state per action on following streets
+                    state = copy.deepcopy(state)
+                    state.updateForAction(action)
+                    self.states.append(state)
         state = copy.deepcopy(state)
         state.endHand(hand.collectees, hand.pot.returned)
         self.states.append(state)
-        for i, s in enumerate(self.states):
-            print("self.states[%d]: %s"%(i, str(s)))
+        # for i, s in enumerate(self.states):
+        #     print("self.states[%d]: %s"%(i, str(s)))
 
         # Clear and repopulate the row of buttons
         for idx in reversed(range(self.buttonBox.count())):
@@ -362,6 +367,8 @@ class ICM:
         return eq
 
 class TableState:
+    AGGREGATE_ANTE = True
+
     def __init__(self, hand):
         self.pot = Decimal(0)
         self.street = None
@@ -396,30 +403,47 @@ class TableState:
 
     def startPhase(self, phase):
         self.street = phase
-        if phase in ("BLINDSANTES", "PREFLOP", "DEAL"):
+        if phase in ("BLINDSANTES", "DEAL"):
+            # Nothing to do...
             return
+        else:
+            for player in self.players.values():
+                player.justacted = False
+                player.action = None
+            if phase == 'PREFLOP':
+                # clean ONLY post blind & ante actions.
+                # We want to keep SB & BB bet state as is.
+                return
 
-        self.renderBoard.add(phase)
+            self.renderBoard.add(phase)
 
-        for player in self.players.values():
-            player.justacted = False
-            if player.bet > self.called:
-                player.stack += player.bet - self.called
-                player.bet = self.called
-            self.pot += player.bet
-            player.bet = Decimal(0)
-            if phase in ("THIRD", "FOURTH", "FIFTH", "SIXTH", "SEVENTH"):
-                player.holecards = player.streetcards[self.street]
-        self.bet = Decimal(0)
-        self.called = Decimal(0)
-        self.allinThisStreet = False
+            for player in self.players.values():
+                player.justacted = False
+                player.action = None
+                if player.bet > self.called:
+                    player.stack += player.bet - self.called
+                    player.bet = self.called
+                self.pot += player.bet
+                player.bet = Decimal(0)
+                if phase in ("THIRD", "FOURTH", "FIFTH", "SIXTH", "SEVENTH"):
+                    player.holecards = player.streetcards[self.street]
+            self.bet = Decimal(0)
+            self.called = Decimal(0)
+            self.allinThisStreet = False
 
     def updateForAction(self, action):
-        for player in self.players.values():
-            player.justacted = False
+        do_aggregate = self.street in ("BLINDSANTES", "DEAL") and self.AGGREGATE_ANTE
+        if not do_aggregate:
+            for player in self.players.values():
+                player.justacted = False
 
         player = self.players[action[0]]
-        player.action = action[1]
+        if player.action is None or not do_aggregate:
+            player.action = action[1]
+        else:
+            actions = player.action.split(" & ")
+            actions.append(action[1])
+            player.action = " & ".join(sorted(actions))
         player.justacted = True
         if action[1] == "checks":
             pass
