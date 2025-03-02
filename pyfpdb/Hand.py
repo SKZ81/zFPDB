@@ -456,8 +456,6 @@ class Hand(object):
         print(str(res))
         self.tablename = res['tablename']
         self.handid    = res['sitehandno']
-        if res['seats']:
-            self.maxseats  = res['seats']
         # else: keep default value
 
         # FIXME: Need to figure out why some times come out of the DB as %Y-%m-%d %H:%M:%S+00:00,
