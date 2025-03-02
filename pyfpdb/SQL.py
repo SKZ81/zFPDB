@@ -3655,6 +3655,12 @@ class Sql:
                 and   (p.siteId = %s or %s = -1)
             """
 
+        self.query['get_heroes_for_siteId'] ="""
+                select p.id, p.name
+                from Players p
+                where p.siteId = %s and p.hero = true
+            """
+
         self.query['get_gameinfo_from_hid'] = """
                 SELECT
                         s.name,

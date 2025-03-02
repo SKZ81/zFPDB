@@ -1319,6 +1319,12 @@ class Database:
         rows = c.fetchall()
         return rows
 
+    def get_heroes_for_siteId(self, site_id):
+        c = self.get_cursor()
+        c.execute(self.sql.query['get_heroes_for_siteId'], (site_id,))
+        rows = c.fetchall()
+        return rows
+
     def get_site_id(self, site):
         c = self.get_cursor()
         c.execute(self.sql.query['getSiteId'], (site,))
@@ -3160,7 +3166,9 @@ class Database:
     
     def insertPlayer(self, name, site_id, hero):
         insert_player = "INSERT INTO Players (name, siteId, hero, chars) VALUES (%s, %s, %s, %s)"
+        print("INSERT %s, %s, %s"%(name, site_id, hero))
         insert_player = insert_player.replace('%s', self.sql.query['placeholder'])
+        # _name = Charset.to_utf8(name)
         if re_char.match(name[0]):
             char = '123'
         elif len(name)==1 or re_char.match(name[1]):
