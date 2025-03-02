@@ -342,7 +342,7 @@ class Email:
 
 class Site:
     def __init__(self, node):
-        self.site_name    = node.getAttribute("site_name")
+        self.name    = node.getAttribute("name")
         self.screen_name  = node.getAttribute("screen_name")
         self.site_path    = normalizePath(node.getAttribute("site_path"))
         self.HH_path    = normalizePath(node.getAttribute("HH_path"))
@@ -377,7 +377,7 @@ class Site:
 
 
     def __str__(self):
-        temp = "Site = " + self.site_name + "\n"
+        temp = "Site = " + self.name + "\n"
         for key in dir(self):
             if key.startswith('__'): continue
             if key == 'layout_set':  continue
@@ -403,7 +403,7 @@ class Stat:
     def __init__(self, node):
         rowcol         = node.getAttribute("_rowcol")                      # human string "(r,c)" values >0)
         self.rowcol    = tuple(int(s)-1 for s in rowcol[1:-1].split(',')) # tuple (r-1,c-1)
-        self.stat_name = node.getAttribute("_stat_name")
+        self.stat_name = node.getAttribute("name")
         self.tip     = node.getAttribute("tip")
         self.click    = node.getAttribute("click")
         self.popup    = node.getAttribute("popup")
@@ -901,12 +901,12 @@ class Config:
 #        s_sites = doc.getElementsByTagName("supported_sites")
         for site_node in doc.getElementsByTagName("site"):
             site = Site(node = site_node)
-            self.supported_sites[site.site_name] = site
+            self.supported_sites[site.name] = site
 
 #        s_games = doc.getElementsByTagName("supported_games")
         for supported_game_node in doc.getElementsByTagName("game"):
             supported_game = Supported_games(supported_game_node)
-            self.supported_games[supported_game.game_name] = supported_game
+            self.supported_games[supported_game.name] = supported_game
 
         # parse databases defined by user in the <supported_databases> section
         # the user may select the actual database to use via commandline or by setting the selected="bool"
@@ -1040,7 +1040,7 @@ class Config:
 
     def get_site_node(self, site):
         for site_node in self.doc.getElementsByTagName("site"):
-            if site_node.getAttribute("site_name") == site:
+            if site_node.getAttribute("name") == site:
                 return site_node
 
     def getEmailNode(self, siteName, fetchType):
@@ -1565,7 +1565,7 @@ class Config:
         parms["site_path"]    = self.supported_sites[site].site_path
         parms["HH_path"]    = self.supported_sites[site].HH_path
         parms["TS_path"]    = self.supported_sites[site].TS_path
-        parms["site_name"]    = self.supported_sites[site].site_name
+        parms["name"]    = self.supported_sites[site].name
         parms["enabled"]    = self.supported_sites[site].enabled
         parms["aux_enabled"]    = self.supported_sites[site].aux_enabled
         parms["hud_menu_xshift"] = self.supported_sites[site].hud_menu_xshift
