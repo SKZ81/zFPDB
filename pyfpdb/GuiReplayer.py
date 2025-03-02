@@ -31,7 +31,8 @@ import SQL
 import Deck
 
 from PyQt6.QtCore import (QPoint, QRect, QRectF, Qt, QTimer)
-from PyQt6.QtGui import (QColor, QImage, QPainter, QPainterPath, QPen)
+from PyQt6.QtGui import (QColor, QImage, QPainter, QPainterPath, QPen, QFont,
+                         QFontMetrics)
 from PyQt6.QtWidgets import (QHBoxLayout, QPushButton, QSlider, QVBoxLayout,
                              QWidget)
 
@@ -48,7 +49,6 @@ class GuiReplayer(QWidget):
     """A Replayer to replay hands."""
     def __init__(self, config, querylist, mainwin, handlist):
         QWidget.__init__(self, None)
-        self.setFixedSize(800, 680)
         self.conf = config
         self.main_window = mainwin
         self.sql = querylist
@@ -58,8 +58,24 @@ class GuiReplayer(QWidget):
         self.handlist = handlist
         self.handidx = 0
 
+        self.playerBackdrop = QImage(os.path.join(self.conf.graphics_path, u"playerbackdrop.png"))
+        self.tableImage = QImage(os.path.join(self.conf.graphics_path, u"Table.png"))
+
+        self.deck_inst = Deck.Deck(self.conf, height=CARD_HEIGHT, width=CARD_WIDTH)
+        self.cardwidth = CARD_WIDTH
+        self.cardheight = CARD_HEIGHT
+        self.cardImages = [None] * 53
+        suits = ('s', 'h', 'd', 'c')
+        ranks = (14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2)
+        for j in range(0, 13):
+            for i in range(0, 4):
+                index = Card.cardFromValueSuit(ranks[j], suits[i])
+                self.cardImages[index] = self.deck_inst.card(suits[i], ranks[j])
+        self.cardImages[0] = self.deck_inst.back()
+
+        self.setFixedSize(self.tableImage.width(), self.tableImage.height())
         self.setWindowTitle("FPDB Hand Replayer")
-        
+
         self.replayBox = QVBoxLayout()
         self.setLayout(self.replayBox)
 
@@ -92,10 +108,6 @@ class GuiReplayer(QWidget):
 
         self.playing = False
 
-        self.tableImage = None
-        self.playerBackdrop = None
-        self.cardImages = None
-        self.deck_inst = Deck.Deck(self.conf, height=CARD_HEIGHT, width=CARD_WIDTH)
         self.show()
 
     def renderCards(self, painter, cards, x, y):
@@ -105,32 +117,16 @@ class GuiReplayer(QWidget):
             x += self.cardwidth
 
     def paintEvent(self, event):
-        if self.tableImage is None or self.playerBackdrop is None:
-            try:
-                self.playerBackdrop = QImage(os.path.join(self.conf.graphics_path, u"playerbackdrop.png"))
-                self.tableImage = QImage(os.path.join(self.conf.graphics_path, u"Table.png"))
-            except:
-                return
-        if self.cardImages is None:
-            self.cardwidth = CARD_WIDTH
-            self.cardheight = CARD_HEIGHT
-            self.cardImages = [None] * 53
-            suits = ('s', 'h', 'd', 'c')
-            ranks = (14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2)
-            for j in range(0, 13):
-                for i in range(0, 4):
-                    index = Card.cardFromValueSuit(ranks[j], suits[i])
-                    self.cardImages[index] = self.deck_inst.card(suits[i], ranks[j])
-            self.cardImages[0] = self.deck_inst.back()
-
         if not event.rect().intersects(QRect(0, 0, self.tableImage.width(), self.tableImage.height())):
             return
 
         painter = QPainter(self)
         painter.drawImage(QPoint(0,0), self.tableImage)
-
         if len(self.states) == 0:
             return
+
+        font = QFont("Arial", 12, QFont.Weight.Normal)
+        painter.setFont(font)
 
         state = self.states[self.stateSlider.value()]
 
@@ -144,10 +140,10 @@ class GuiReplayer(QWidget):
             playerx = convertx(player.x)
             playery = converty(player.y)
             painter.drawImage(QPoint(playerx - self.playerBackdrop.width() // 2, playery - 3), self.playerBackdrop)
-            if player.action=="folds":
-                painter.Qt.GlobalColor.grey
+            if player.folded:
+                painter.setPen(Qt.GlobalColor.gray)
             else:
-                painter.Qt.GlobalColor.white
+                painter.setPen(Qt.GlobalColor.white)
                 x = playerx - self.cardwidth * len(player.holecards) // 2
                 self.renderCards(painter, player.holecards,
                                  x, playery - self.cardheight)
@@ -159,18 +155,10 @@ class GuiReplayer(QWidget):
                                             player.stack))
 
             if player.justacted:
-                painter.Qt.GlobalColor.yellow
+                painter.setPen(Qt.GlobalColor.yellow)
                 painter.drawText(QRect(playerx - 50, playery + 15, 100, 20), Qt.AlignmentFlag.AlignCenter, player.action)
             else:
-                painter.Qt.GlobalColor.white
-
-            if player.chips != 0:
-                painter.drawText(QRect(convertx(player.x * .65) - 100,
-                                        converty(player.y * 0.65),
-                                        200,
-                                        20),
-                                    Qt.AlignmentFlag.AlignCenter,
-                                    '%s%.2f' % (self.currency, player.chips))
+                painter.setPen(Qt.GlobalColor.white)
 
             if player.bounty:
                 path = QPainterPath()
@@ -184,13 +172,21 @@ class GuiReplayer(QWidget):
                 painter.setPen(pen)
                 painter.fillPath(path, Qt.GlobalColor.red)
                 painter.drawPath(path)
-                painter.Qt.GlobalColor.white
+                painter.setPen(Qt.GlobalColor.white)
                 painter.drawText(QRect(
                         playerx - 30 + self.playerBackdrop.width() // 2,
                         playery - 26, 30, 20),
                     Qt.AlignmentFlag.AlignCenter, str(player.bounty))
-        painter.Qt.GlobalColor.white
 
+            if player.bet != 0:
+                painter.drawText(QRect(convertx(player.x * .65) - 100,
+                                         converty(player.y * 0.65),
+                                         200,
+                                         20),
+                                     Qt.AlignmentFlag.AlignCenter,
+                                     '%s%.2f' % (self.currency, player.bet))
+
+        painter.setPen(Qt.GlobalColor.white)
         if state.pot > 0:
             painter.drawText(QRect(self.tableImage.width() // 2 - 100,
                                    self.tableImage.height() // 2 - 20,
@@ -386,8 +382,17 @@ class TableState:
         for x in hand.players:
             print(str(x))
             #TODO : why is there a new unpacked value here ?
-        for seat, name, chips, pos, bounty in hand.players:
-            self.players[name] = Player(hand, name, chips, seat, bounty)
+        for seat, name, stack, pos, bounty in hand.players:
+            self.players[name] = Player(hand, name, stack, seat, bounty)
+
+    def __repr__(self):
+        stateStr = "Street: %s, Pot is %s Board: %s\nBet: %s, Called: %s. %s %s\nPlayers:\n"%(self.street, self.pot, self.board,
+                           self.bet, self.called,
+                           "ALL-IN !!" if self.allin else '', " (this street)"
+                           if self.allinThisStreet else '')
+        for p in self.players.values():
+            stateStr += str(p) + '\n'
+        return stateStr
 
     def startPhase(self, phase):
         self.street = phase
@@ -398,11 +403,11 @@ class TableState:
 
         for player in self.players.values():
             player.justacted = False
-            if player.chips > self.called:
-                player.stack += player.chips - self.called
-                player.chips = self.called
-            self.pot += player.chips
-            player.chips = Decimal(0)
+            if player.bet > self.called:
+                player.stack += player.bet - self.called
+                player.bet = self.called
+            self.pot += player.bet
+            player.bet = Decimal(0)
             if phase in ("THIRD", "FOURTH", "FIFTH", "SIXTH", "SEVENTH"):
                 player.holecards = player.streetcards[self.street]
         self.bet = Decimal(0)
@@ -416,27 +421,29 @@ class TableState:
         player = self.players[action[0]]
         player.action = action[1]
         player.justacted = True
-        if action[1] == "folds" or action[1] == "checks":
+        if action[1] == "checks":
             pass
+        elif action[1] == "folds":
+            player.folded = True
         elif action[1] == "raises" or action[1] == "bets":
             if self.allinThisStreet:
                 self.called = Decimal(self.bet)
             else:
                 self.called = Decimal(0)
-            diff = self.bet - player.chips
+            diff = self.bet - player.bet
             self.bet += action[2]
-            player.chips += action[2] + diff
+            player.bet += action[2] + diff
             player.stack -= action[2] + diff
         elif action[1] == "big blind":
             self.bet = action[2]
-            player.chips += action[2]
+            player.bet += action[2]
             player.stack -= action[2]
         elif action[1] == "calls" or action[1] == "small blind" or action[1] == "secondsb":
-            player.chips += action[2]
+            player.bet += action[2]
             player.stack -= action[2]
-            self.called = max(self.called, player.chips)
+            self.called = max(self.called, player.bet)
         elif action[1] == "both":
-            player.chips += action[2]
+            player.bet += action[2]
             player.stack -= action[2]
         elif action[1] == "ante":
             self.pot += action[2]
@@ -449,7 +456,7 @@ class TableState:
         elif action[1] == "stands pat":
             pass
         elif action[1] == "bringin":
-            player.chips += action[2]
+            player.bet += action[2]
             player.stack -= action[2]
         else:
             print("unhandled action: " + str(action))
@@ -461,12 +468,13 @@ class TableState:
         self.pot = Decimal(0)
         for player in self.players.values():
             player.justacted = False
-            player.chips = Decimal(0)
+            player.bet = Decimal(0)
             if self.gamebase == 'draw':
                 player.holecards = player.streetcards[self.street]
         for name,amount in collectees.items():
             player = self.players[name]
-            player.chips += amount
+            # Use "bet" to display collected chips
+            player.bet += amount
             player.action = "collected"
             player.justacted = True
         for name, amount in returned.items():
@@ -475,12 +483,13 @@ class TableState:
 class Player:
     def __init__(self, hand, name, stack, seat, bounty=None):
         self.stack     = Decimal(stack)
-        self.chips     = Decimal(0)
+        self.bet     = Decimal(0)
         self.seat      = seat
         self.name      = name
         self.bounty    = bounty
         self.action    = None
         self.justacted = False
+        self.folded    = False
         self.holecards = hand.join_holecards(name, asList=True)
         self.streetcards = {}
         if hand.gametype['base'] == 'draw':
@@ -493,6 +502,11 @@ class Player:
             self.holecards = self.streetcards[hand.actionStreets[1]]
         self.x         = 0.5 * math.cos(2 * self.seat * math.pi / hand.maxseats)
         self.y         = 0.5 * math.sin(2 * self.seat * math.pi / hand.maxseats)
+
+    def __repr__(self):
+        if self.folded:
+            return "-- %s (%s) FOLDED"%(self.name, self.stack)
+        return "%s %s (%s/%s): %s"%( '>>' if self.justacted else '  ', self.name, self.stack, self.bet, self.action)
 
 if __name__ == '__main__':
     config = Configuration.Config()
