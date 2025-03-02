@@ -70,7 +70,7 @@ class GuiTourneyListViewer(GuiTourneyViewer):
         self.frame.layout().addWidget(self.table)
         self.table.doubleClicked.connect(self.row_activated)
         # self.table.contextMenuEvent = self.contextMenu
-
+        self.refreshTourneyList()
         # self.mainVBox.show()
     #end def __init__
 
