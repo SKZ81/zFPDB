@@ -45,26 +45,28 @@ class Winamax(HandHistoryConverter):
     filetype = "text"
     codepage = ("utf8", "cp1252")
 
-    mixes = { } # Legal mixed games
-    sym = {'USD': "\$", 'CAD': "\$", 'T$': "", "EUR": u"\xe2\x82\xac|\u20ac", "GBP": "\xa3", "play": ""}         # ADD Euro, Sterling, etc HERE
+    sym = {'USD': r"\$", 'CAD': r"\$", 'T$': "", "EUR": u"\xe2\x82\xac|\u20ac", "GBP": r"\£", "play": ""}         # ADD Euro, Sterling, etc HERE
+    games = {
+        # label             :  (base, category)
+        "Holdem"            : ('hold','holdem'),
+        "Omaha"             : ('hold','omahahi'),
+        "5 Card Omaha"      : ('hold','5_omahahi'),
+        "5 Card Omaha Hi/Lo": ('hold','5_omahahi'), #incorrect in file
+        "Omaha Hi/Lo"       : ('hold','omahahilo'),
+        "7-Card Stud"       : ('stud','studhi'),
+        "7-Card Stud Hi/Lo" : ('stud','studhilo'),
+        "Razz"              : ('stud','razz'),
+        "2-7 Triple Draw"   : ('draw','27_3draw')
+    }
     substitutions = {
-                     'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",     # legal ISO currency codes
-                            'LS' : u"\$|\xe2\x82\xac|\u20ac|" # legal currency symbols - Euro(cp1252, utf-8)
-                    }
+        'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",     # legal ISO currency codes
+        'LS' : r"\$|\xe2\x82\xac|\u20ac", # legal currency symbols - Euro(cp1252, utf-8)
+        'GAMES_LIST' : "|".join(map(re.escape, games.keys()))
+    }
 
     limits = { 'no limit':'nl', 'pot limit' : 'pl', 'fixed limit':'fl'}
 
-    games = {                          # base, category
-                                "Holdem" : ('hold','holdem'),
-                                 'Omaha' : ('hold','omahahi'),
-                           "5 Card Omaha": ('hold','5_omahahi'),
-                     "5 Card Omaha Hi/Lo": ('hold','5_omahahi'), #incorrect in file
-                            "Omaha Hi/Lo": ('hold','omahahilo'),
-                            "7-Card Stud": ('stud','studhi'),
-                      "7-Card Stud Hi/Lo": ('stud','studhilo'),
-                                   "Razz": ('stud','razz'),
-                        "2-7 Triple Draw": ('draw','27_3draw')
-               }
+
     mixes = { 
                '8games' : '8game',
               '10games' : '10game',
@@ -73,36 +75,39 @@ class Winamax(HandHistoryConverter):
 
     # Static regexes
     # ***** End of hand R5-75443872-57 *****
-    re_Identify = re.compile(u'Winamax\sPoker\s\-\s(CashGame|Tournament\s")')
+    re_Identify = re.compile(r'Winamax\sPoker\s\-\s(CashGame|HOLD-UP|ESCAPE|Tournament\s")')
     re_SplitHands = re.compile(r'\n\n')
 
     siteId = 9 # TODO should be requested in database
 
 # Winamax Poker - CashGame - HandId: #279823-223-1285031451 - Holdem no limit (0.02€/0.05€) - 2010/09/21 03:10:51 UTC
 # Table: 'Charenton-le-Pont' 9-max (real money) Seat #5 is the button
-    re_HandInfo = re.compile(u"""
+
+# Winamax Poker - Tournament "Starting Block WiPT - Déglingos" buyIn: 0€ + 0€ level: 1 - HandId: #3774912615482916865-1-1734898890 - Holdem no limit (10/20) - 2024/12/22 20:21:30 UTC
+#Table: 'Starting Block WiPT - Déglingos(878915334)#0' 6-max (real money) Seat #3 is the button
+    re_HandInfo = re.compile(r"""
             \s*Winamax\sPoker\s-\s
-            (?P<RING>CashGame|HOLD-UP|ESCAPE)?
+            ((?P<RING>CashGame|HOLD-UP|ESCAPE)[^-]*)?
             (?P<TOUR>Tournament\s
-            \"(?P<TOURNAME>)\"\s
-            # buyIn:\s(?P<BUYIN>(?P<BIAMT>[%(LS)s\d\,.]+)((\s\+?\s|-)(?P<BIBOUNTY>[%(LS)s\d\.]+))?(\s\+?\s|-)(?P<BIRAKE>[%(LS)s\d\,.]+)\s+)
-            (level:\s(?P<LEVEL>\d+))?
-            .*)?
+            \"(?P<TOURNAME>.+)\"\s
+            buyIn:\s(?P<BUYIN>(?P<BIAMT>[%(LS)s\d\,.]+)((\s\+?\s|-)(?P<BIBOUNTY>[%(LS)s\d\.]+))?(\s\+?\s|-)(?P<BIRAKE>[%(LS)s\d\,.]+))
+            \slevel:\s(?P<LEVEL>\d+))?
             \s-\sHandId:\s\#(?P<HID1>\d+)-(?P<HID2>\d+)-(?P<HID3>\d+)\s-\s  # REB says: HID3 is the correct hand number
-            (?P<GAME>Holdem|Omaha|5\sCard\sOmaha|5\sCard\sOmaha\sHi/Lo|Omaha\sHi/Lo|7\-Card\sStud|7\-Card\sStud\sHi/Lo|Razz|2\-7\sTriple\sDraw)\s
+            (?P<GAME>%(GAMES_LIST)s)\s
             (?P<LIMIT>fixed\slimit|no\slimit|pot\slimit)\s
             \(
             (((%(LS)s)?(?P<ANTE>[.0-9]+)(%(LS)s)?)/)?
             ((%(LS)s)?(?P<SB>[.0-9]+)(%(LS)s)?)/
             ((%(LS)s)?(?P<BB>[.0-9]+)(%(LS)s)?)
             \)\s-\s
-            (?P<DATETIME>.*)
-            Table:\s\'(?P<TABLE>[^(]+)
-            (.(?P<TOURNO>\d+).\#(?P<TABLENO>\d+))?.*
-            \'
+            (?P<DATETIME>.+$)
+            [\n\r]+
+            ^Table:\s\'(?P<TABLE>[^(]+)
+            (\((?P<TOURNO>\d+)\)\#(?P<TABLENO>\d+))?
+            .*\'
             \s(?P<MAXPLAYER>\d+)\-max
             \s(?P<MONEY>\(real\smoney\))?
-            """ % substitutions, re.MULTILINE|re.DOTALL|re.VERBOSE)
+            """ % substitutions, re.MULTILINE|re.VERBOSE)
 
     re_TailSplitHands = re.compile(r'\n\s*\n')
     re_Button       = re.compile(r'Seat\s#(?P<BUTTON>\d+)\sis\sthe\sbutton')
@@ -221,6 +226,7 @@ class Winamax(HandHistoryConverter):
         return info
 
     def readHandInfo(self, hand):
+        print("Hand Text:", hand.handText)
         info = {}
         m =  self.re_HandInfo.search(hand.handText)
         if m is None:
@@ -229,6 +235,11 @@ class Winamax(HandHistoryConverter):
             raise FpdbParseError
 
         info.update(m.groupdict())
+        # Fix for python >= 3.7
+        # info.update({k: v for k, v in m.groupdict().items() if v is not None})
+
+        print("Info:", info)
+
         if info['DATETIME'] is not None:
             a = self.re_DateTime.search(info['DATETIME'])
             if a:

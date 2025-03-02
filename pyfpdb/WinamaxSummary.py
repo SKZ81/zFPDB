@@ -20,6 +20,7 @@ _ = L10n.get_translation()
 
 from decimal_wrapper import Decimal
 import datetime
+# from bs4 import BeautifulSoup
 
 from Exceptions import FpdbParseError
 from HandHistoryConverter import *
@@ -29,53 +30,52 @@ from TourneySummary import *
 
 class WinamaxSummary(TourneySummary):
     
-    limits = { 'No Limit':'nl', 'Pot Limit':'pl', 'Limit':'fl', 'LIMIT':'fl' }
-    games = {                          # base, category
-                               "Hold'em" : ('hold','holdem'), 
-                                 'Omaha' : ('hold','omahahi'),
-                           "5 Card Omaha": ('hold','5_omahahi'),
-                     "5 Card Omaha Hi/Lo": ('hold','5_omahahi'), #incorrect in file
-                            "Omaha Hi/Lo": ('hold','omahahilo'),
-                            "7-Card Stud": ('stud','studhi'),
-                      "7-Card Stud Hi/Lo": ('stud','studhilo'),
-                                   "Razz": ('stud','razz'),
-                        "2-7 Triple Draw": ('draw','27_3draw')
-               }
+    # limits = { 'No Limit':'nl', 'Pot Limit':'pl', 'Limit':'fl', 'LIMIT':'fl' }
+    # games = {                          # base, category
+    #                            "Hold'em" : ('hold','holdem'),
+    #                              'Omaha' : ('hold','omaha'),
+    #                        "5 Card Omaha": ('hold','omaha5'), # TODO: check value
+    #                  "5 Card Omaha Hi/Lo": ('hold','5omaha8'), # TODO: check value
+    #                         "Omaha Hi/Lo": ('hold','omaha8'),
+    #                         "7-Card Stud": ('stud','studhi'), # TODO: check value
+    #                   "7-Card Stud Hi/Lo": ('stud','studhilo'), # TODO: check value
+    #                                "Razz": ('stud','razz'), # TODO: check value
+    #                     "2-7 Triple Draw": ('draw','27_3draw') # TODO: check value
+    #           }
 
     substitutions = {
                      'LEGAL_ISO' : "USD|EUR|GBP|CAD|FPP",     # legal ISO currency codes
                             'LS' : r"\$|\xe2\x82\xac|\u20ac" # legal currency symbols
                     }
-    
-    re_Identify = re.compile(u"Winamax\sPoker\s\-\sTournament\ssummary")
-    
-    re_SummaryTourneyInfo = re.compile(u"""\s:\s
-                                           (?P<TOURNAME>.+)
-                                           \((?P<TOURNO>[0-9]+)\)(\s-\sLate\sRegistration)?\s+
-                                           (Player\s:\s(?P<PNAME>.*)\s+)?
-                                           Buy-In\s:\s(?P<BUYIN>((?P<BIAMT>[\d\,.]+)(?P<BICURR>[%(LS)s])?[\s+]+)((?P<BIBOUNTY>[\d\,.]+)[%(LS)s\s+]+)?(?P<BIRAKE>[\d\,.]+)[%(LS)s\s+]+)\s+
-                                           (Rebuy\scost\s:\s(?P<REBUY>(?P<REBUYAMT>.+)\s\+\s(?P<REBUYRAKE>.+))\s+)?
-                                           (Addon\scost\s:\s(?P<ADDON>(?P<ADDONAMT>.+)\s\+\s(?P<ADDONRAKE>.+))\s+)?
-                                           (Your\srebuys\s:\s(?P<PREBUYS>\d+)\s+)?
-                                           (Your\saddons\s:\s(?P<PADDONS>\d+)\s+)?
-                                           Registered\splayers\s:\s(?P<ENTRIES>[0-9]+)\s+
-                                           (Total\srebuys\s:\s\d+\s+)?
-                                           (Total\saddons\s:\s\d+\s+)?
-                                           (Mode\s:\s(?P<TMODE>[^\s]+)\s+)?
-                                           (Type\s:\s(?P<TTYPE>[^\s]+)\s+)?
-                                           (Speed\s:\s(?P<SPEED>.+)?\s+)?
-                                           (Flight\sID\s:\s.+\s+)?
-                                           (Levels\s:\s.+\s+)?
-                                           Prizepool\s:\s(?P<PRIZEPOOL>[.0-9%(LS)s]+)\s+
-                                           Tournament\sstarted\s(?P<DATETIME>[0-9]{4}\/[0-9]{2}\/[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\sUTC)\s+
-                                           You\splayed\s(?P<PLAYTIME>(((?P<PLAYTIME_H>\d+)h\s)?((?P<PLAYTIME_M>\d+)min\s)?(?P<PLAYTIME_S>\d+)s))\s+
-                                           You\sfinished\sin\s(?P<RANK>[0-9]+)(st|nd|rd|th)\splace\s+
-                                           (You\swon\s(?P<WINNINGS>[.0-9%(LS)s]+)(\s\+\s(?P<WINNINGS_BOUNTY>))?)?
-                                        """ % substitutions ,re.VERBOSE|re.MULTILINE)
-
-    re_DateTime = re.compile("\[(?P<Y>[0-9]{4})\/(?P<M>[0-9]{2})\/(?P<D>[0-9]{2})[\- ]+(?P<H>[0-9]+):(?P<MIN>[0-9]+):(?P<S>[0-9]+)")
-
     codepage = ("utf8", "cp1252")
+
+    re_Identify = re.compile(r"Winamax\sPoker\s\-\sTournament\ssummary")
+    
+    re_SummaryTourneyInfo = re.compile(r"""
+        \s:\s
+        (?P<TOURNAME>.+)\((?P<TOURNO>[0-9]+)\)(\s-\sLate\sRegistration)?\s+
+        (Player\s:\s(?P<PNAME>.*)\s+)?
+        Buy-In\s:\s(?P<BUYIN>((?P<BIAMT>[\d\,.]+)(?P<BICURR>[%(LS)s])?[\s+]+)((?P<BIBOUNTY>[\d\,.]+)[%(LS)s\s+]+)?(?P<BIRAKE>[\d\,.]+)[%(LS)s\s+]+)\s+
+        (Rebuy\scost\s:\s(?P<REBUY>(?P<REBUYAMT>.+)\s\+\s(?P<REBUYRAKE>.+))\s+)?
+        (Addon\scost\s:\s(?P<ADDON>(?P<ADDONAMT>.+)\s\+\s(?P<ADDONRAKE>.+))\s+)?
+        (Your\srebuys\s:\s(?P<PREBUYS>\d+)\s+)?
+        (Your\saddons\s:\s(?P<PADDONS>\d+)\s+)?
+        Registered\splayers\s:\s(?P<ENTRIES>[0-9]+)\s+
+        (Total\srebuys\s:\s\d+\s+)?
+        (Total\saddons\s:\s\d+\s+)?
+        (Mode\s:\s(?P<TMODE>[^\s]+)\s+)?
+        (Type\s:\s(?P<TTYPE>[^\s]+)\s+)?
+        (Speed\s:\s(?P<SPEED>.+)?\s+)?
+        (Flight\sID\s:\s.+\s+)?
+        (Levels\s:\s.+\s+)?
+        Prizepool\s:\s(?P<PRIZEPOOL>[.0-9%(LS)s]+)\s+
+        Tournament\sstarted\s(?P<DATETIME>[0-9]{4}\/[0-9]{2}\/[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\sUTC)\s+
+        You\splayed\s(?P<PLAYTIME>(((?P<PLAYTIME_H>\d+)h\s)?((?P<PLAYTIME_M>\d+)min\s)?(?P<PLAYTIME_S>\d+)s))\s+
+        You\sfinished\sin\s(?P<RANK>[0-9]+)(st|nd|rd|th)\splace\s+
+        (You\swon\s(?P<WINNINGS>[.0-9%(LS)s]+)?(\s\+\s)?(Bounty\s(?P<WINNINGS_BOUNTY>[.0-9%(LS)s]+))?)?
+        """ % substitutions ,re.VERBOSE|re.MULTILINE)
+
+    # re_DateTime = re.compile(r"\[(?P<Y>[0-9]{4})\/(?P<M>[0-9]{2})\/(?P<D>[0-9]{2})[\- ]+(?P<H>[0-9]+):(?P<MIN>[0-9]+):(?P<S>[0-9]+)")
 
     @staticmethod
     def getSplitRe(self, head):
@@ -103,8 +103,10 @@ class WinamaxSummary(TourneySummary):
                     seconds=int(mg['PLAYTIME_S']))
 
         #FIXME: buyinCurrency and currency not detected
-        self.buyinCurrency = 'EUR'
-        self.currency  = 'EUR'
+        if 'BICURR' in mg:
+
+            self.buyinCurrency = mg['BICURR']
+            self.currency  = mg['BICURR']
 
         if 'BUYIN' in mg:
             if mg['BUYIN'].find(u"€")!=-1:
@@ -180,6 +182,7 @@ class WinamaxSummary(TourneySummary):
                 self.addPlayer(rank, name, winnings, self.currency, rebuyCount, addOnCount, koCount)
 
     def convert_to_decimal(self, string):
+        print("convert_to_decimal:", string)
         dec = self.clearMoneyString(string)
         dec = Decimal(dec)
         return dec
