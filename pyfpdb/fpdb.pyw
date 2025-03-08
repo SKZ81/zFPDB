@@ -967,6 +967,19 @@ class fpdb(QMainWindow):
         if hasattr(self.db, 'wrongDbVersion'):
             if not self.db.wrongDbVersion:
                 self.validate_config()
+        if self.config.theme.name:
+            theme_file = os.path.join(self.config.fpdb_root_path,
+                                      self.config.theme.path,
+                                      self.config.theme.name,
+                                      self.config.theme.name + '.qss')
+            print("theme file path:", theme_file)
+            try:
+                with open(theme_file,'r') as qssfile:
+                    qss = qssfile.read()
+                    app.setStyleSheet(qss)
+            except FileNotFoundError:
+                themeWarning = QMessageBox(QMessageBox.Icon.Warning, _("Theme file was not found..."), _("Ignoring theme file: ") + theme_file, QMessageBox.StandardButton.Ok, self)
+                themeWarning.exec()
 
     def obtain_global_lock(self, source):
         ret = self.lock.acquire(source=source)  # will return false if lock is already held

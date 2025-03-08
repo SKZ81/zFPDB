@@ -14,6 +14,7 @@
 
     <import callFpdbHud = "True" interval = "5"  fastStoreHudCache="False" saveActions="True" cacheSessions="False" sessionTimeout="30" publicDB="False"></import>
 
+    <gui_qss_theme theme_name="" theme_path="qssThemes" />
 
     <gui_cash_stats>
         <col col_name="game"       disp_all="True"  disp_posn="True"  col_title="Game"     xalignment="0.0" field_format="%s"    field_type="str"/>

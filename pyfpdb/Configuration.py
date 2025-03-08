@@ -741,6 +741,16 @@ class GUICashStats(list):
 #            s = s + "    %s = %s\n" % (k, self[k])
 #        return(s)
 
+class GuiQSSTheme:
+    def __init__(self, node):
+        self.name = None
+        self.path = None
+        for (name, value) in node.attributes.items():
+            if name.startswith('theme_'):
+                name = name[6:]
+            log.debug(_("config.gui_qss_theme: adding %s = %s") % (name,value))
+            self.__setattr__(name, value)
+
 class RawHands:
     def __init__(self, node=None):
         if node==None:
@@ -950,6 +960,10 @@ class Config:
         for hui_node in doc.getElementsByTagName('hud_ui'):
             hui = HudUI(node = hui_node)
             self.ui = hui
+
+        for theme_node in doc.getElementsByTagName("gui_qss_theme"):
+            theme = GuiQSSTheme(node = theme_node)
+            self.theme = theme
 
         db = self.get_db_parameters()
         if db['db-password'] == 'YOUR MYSQL PASSWORD':
@@ -1700,6 +1714,10 @@ if __name__== "__main__":
     print("\n----------- GENERAL -----------")
     print(c.general)
 
+    print("\n----------- GUI QSS THEME PARAMS -----------")
+    print(" name = %s" % (c.theme.name))
+    print(" path = %s" % (c.theme.path))
+
     print("\n----------- SUPPORTED SITES -----------")
     for s in c.supported_sites.keys():
         print(c.supported_sites[s])
@@ -1715,7 +1733,7 @@ if __name__== "__main__":
     print("\n----------- AUX WINDOW FORMATS -----------")
     for w in c.aux_windows.keys():
         print(c.aux_windows[w])
-    
+
     print("\n----------- LAYOUT SETS FORMATS -----------")
     for w in c.layout_sets.keys():
         print(c.layout_sets[w])
@@ -1758,6 +1776,4 @@ if __name__== "__main__":
     print("Configuration.python_version =", PYTHON_VERSION)
     print("\n\n----------- END OF CONFIG REPORT -----------")
 
-    print("press enter to end")
-    sys.stdin.readline()
 
