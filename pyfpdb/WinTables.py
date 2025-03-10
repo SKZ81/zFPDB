@@ -32,11 +32,13 @@ import logging
 log = logging.getLogger("hud")
 
 from PyQt6.QtGui import QWindow
-
-#    Other Library modules
-import win32gui
-import win32api
-import win32con
+import ctypes
+EnumWindows = ctypes.windll.user32.EnumWindows
+EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
+GetWindowRect = ctypes.windll.user32.GetWindowRect
+GetWindowText = ctypes.windll.user32.GetWindowTextW
+GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
+IsWindow = ctypes.windll.user32.IsWindow
 
 #    FreePokerTools modules
 from TableWindow import Table_Window
@@ -46,27 +48,34 @@ from TableWindow import Table_Window
 b_width = 3
 tb_height = 29
 
+titles = {}
 
 class Table(Table_Window):
+    # specific win32 values
+    GW_OWNER = 4
+    GWL_EXSTYLE = -20
+    WS_EX_TOOLWINDOW = 0x00000080
+    SM_CXSIZEFRAME = 32
+    SM_CYCAPTION = 4
 
     def find_table_parameters(self):
         """Finds poker client window with the given table name."""
-        titles = {}
-        win32gui.EnumWindows(win_enum_handler, titles)
+        # titles = {}
+        EnumWindows(EnumWindowsProc(win_enum_handler), 0)
         for hwnd in titles:
             if titles[hwnd] == "":
                 continue
             # if window not visible, probably not a table
-            if not win32gui.IsWindowVisible(hwnd): 
+            if not IsWindowVisible(hwnd):
                 continue
             # if window is a child of another window, probably not a table
-            if win32gui.GetParent(hwnd) != 0:
+            if GetParent(hwnd) != 0:
                 continue
-            HasNoOwner = win32gui.GetWindow(hwnd, win32con.GW_OWNER) == 0
-            WindowStyle = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
-            if HasNoOwner and WindowStyle & win32con.WS_EX_TOOLWINDOW != 0:
+            HasNoOwner = GetWindow(hwnd, GW_OWNER) == 0
+            WindowStyle = GetWindowLong(hwnd, GWL_EXSTYLE)
+            if HasNoOwner and WindowStyle & WS_EX_TOOLWINDOW != 0:
                 continue
-            if not HasNoOwner and WindowStyle & win32con.WS_EX_APPWINDOW == 0:
+            if not HasNoOwner and WindowStyle & WS_EX_APPWINDOW == 0:
                 continue
             
             if re.search(self.search_string, titles[hwnd], re.I):
@@ -86,28 +95,31 @@ class Table(Table_Window):
 
     def get_geometry(self):
         try:
-            if win32gui.IsWindow(self.number):
-                (x, y, width, height) = win32gui.GetWindowRect(self.number)
+            if IsWindow(self.number):  # ✅ Checks if the window handle is valid
+                rect = ctypes.wintypes.RECT()  # ✅ Create a RECT structure
+                GetWindowRect(self.number, ctypes.byref(rect))  # ✅ Get window bounds
+                x, y, width, height = rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top
                                 
-                # this apparently returns x = far left side of window, width = far right side of window, y = top of window, height = bottom of window
-                # so apparently we have to subtract x from "width" to get actual width, and y from "height" to get actual height ?
-                # it definitely gives slightly different results than the GTK code that does the same thing.
-
-                # minimised windows are given -32000 (x,y) value,
-                #   so just zeroise to avoid downstream confusion
-                if x < 0: x = 0
-                if y < 0: y = 0
-                
-                width = width - x
-                height = height - y
+#                 # this apparently returns x = far left side of window, width = far right side of window, y = top of window, height = bottom of window
+#                 # so apparently we have to subtract x from "width" to get actual width, and y from "height" to get actual height ?
+#                 # it definitely gives slightly different results than the GTK code that does the same thing.
+#
+#                 # minimised windows are given -32000 (x,y) value,
+#                 #   so just zeroise to avoid downstream confusion
+#                 if x < 0: x = 0
+#                 if y < 0: y = 0
+#
+#                 width = width - x
+#                 height = height - y
                 
                 # determine system titlebar and border setting constant values
                 # see http://stackoverflow.com/questions/431470/window-border-width-and-height-in-win32-how-do-i-get-it
                 try:
                     self.b_width; self.tb_height
                 except:
-                    self.b_width = win32api.GetSystemMetrics(win32con.SM_CXSIZEFRAME) # bordersize
-                    self.tb_height = win32api.GetSystemMetrics(win32con.SM_CYCAPTION) # titlebar height (excl border)
+
+                    self.b_width = GetSystemMetrics(SM_CXSIZEFRAME)
+                    self.tb_height = GetSystemMetrics(SM_CYCAPTION)
 
                 # fixme - x and y must _not_ be adjusted by the b_width if the window has been maximised
                 return {
@@ -123,7 +135,10 @@ class Table(Table_Window):
             return None
 
     def get_window_title(self):
-        return win32gui.GetWindowText(self.number)
+        length = GetWindowTextLength(hwnd)
+        buf = ctypes.create_unicode_buffer(length + 1)
+        GetWindowText(hwnd, buf, length + 1)
+        return buf.value
 
     def topify(self, window):
         """Set the specified Qt window to stayontop in MS Windows."""
@@ -137,5 +152,9 @@ class Table(Table_Window):
             self.gdkhandle = QWindow.fromWinId(int(self.number))
         window.windowHandle().setTransientParent(self.gdkhandle)
 
-def win_enum_handler(hwnd, titles):
-    titles[hwnd] = win32gui.GetWindowText(hwnd)
+def win_enum_handler(hwnd, lParams):
+    length = GetWindowTextLength(hwnd)
+    buf = ctypes.create_unicode_buffer(length + 1)
+    GetWindowText(hwnd, buf, length + 1)
+    titles[hwnd] = buf.value
+    return True

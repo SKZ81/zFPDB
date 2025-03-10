@@ -47,9 +47,8 @@ import sys
 import Configuration
 
 if platform.system() == 'Windows':
-    import winpaths
-    PROGRAM_FILES = winpaths.get_program_files()
-    LOCAL_APPDATA = winpaths.get_local_appdata()
+    PROGRAM_FILES = os.getenv("PROGRAMFILES", "C:\\Program Files")
+    LOCAL_APPDATA = os.getenv('APPDATA', False)  # Returns path or False if not found
 
 class DetectInstalledSites():
 

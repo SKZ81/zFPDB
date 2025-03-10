@@ -33,10 +33,6 @@ _ = L10n.init_translation()
 import re
 import queue
 
-if os.name == 'nt':
-    import win32api
-    import win32con
-
 print("Python " + sys.version)
 
 import codecs

@@ -43,8 +43,8 @@ if __name__ == "__main__":
 log = logging.getLogger("importer")
 
 if os.name == "nt":
-    import win32console
-
+    import ctypes
+    GetConsoleWindow = ctypes.windll.kernel32.GetConsoleWindow
 
 class GuiAutoImport(QWidget):
     def __init__(self, settings, config, sql = None, parent = None, cli = False):
@@ -207,7 +207,7 @@ class GuiAutoImport(QWidget):
                         bs = 1
                     elif os.name == 'nt':
                         path = sys.path[0].replace('\\','\\\\')
-                        if win32console.GetConsoleWindow() == 0:
+                        if GetConsoleWindow() == 0:
                             command = 'pythonw "'+path+'\\HUD_main.pyw" ' + self.settings['cl_options']
                         else:
                             command = 'python "'+path+'\\HUD_main.pyw" ' + self.settings['cl_options']
@@ -221,7 +221,7 @@ class GuiAutoImport(QWidget):
 
                         print(_("opening pipe to HUD"))
                     try:
-                        if self.config.install_method == "exe" or (os.name == "nt" and win32console.GetConsoleWindow() == 0):
+                        if self.config.install_method == "exe" or (os.name == "nt" and GetConsoleWindow() == 0):
                             self.pipe_to_hud = subprocess.Popen(command, bufsize=bs,
                                                                 stdin=subprocess.PIPE,
                                                                 stdout=subprocess.PIPE,  # needed for pythonw / py2exe
