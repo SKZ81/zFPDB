@@ -15,11 +15,21 @@
 #along with this program. If not, see <http://www.gnu.org/licenses/>.
 #In the "official" distribution you can find the license in agpl-3.0.txt.
 from __future__ import print_function
+
+import io
+import os
+import sys
+
+if not sys.stdout:
+    stream = io.StringIO()
+    sys.stdout = stream
+if not sys.stderr:
+    stream = io.StringIO()
+    sys.stderr = stream
+
 import L10n
 _ = L10n.init_translation()
 
-import os
-import sys
 import re
 import queue
 
@@ -27,7 +37,7 @@ if os.name == 'nt':
     import win32api
     import win32con
 
-print("Python " + sys.version[0:3] + '...')
+print("Python " + sys.version)
 
 import codecs
 import traceback
