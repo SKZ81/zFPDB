@@ -59,7 +59,6 @@ if platform.system() == 'Windows':
 else:
     winpaths_appdata = False
 
-print(f"AppData path: {winpaths_appdata}")
 import logging, logging.config
 
 # config version is used to flag a warning at runtime if the users config is
@@ -132,7 +131,14 @@ if os.name == 'posix':
     POSIX = True
 else:
     POSIX = False
-    
+
+print(f"""INSTALL_METHOD: {INSTALL_METHOD}
+FPDB_ROOT_PATH: {FPDB_ROOT_PATH}
+OS_FAMILY: {OS_FAMILY}
+APPDATA_PATH: {APPDATA_PATH}
+CONFIG_PATH: {CONFIG_PATH}
+POSIX: {POSIX}
+""")
 PYTHON_VERSION = sys.version[:3]
     
 # logging has been set up in fpdb.py or HUD_main.py, use their settings:
@@ -210,7 +216,7 @@ def get_config(file_name, fallback = True):
             sys.stderr.write(_("Error copying .example config file, cannot fall back. Exiting.")+"\n")
             sys.stderr.write( str(sys.exc_info()) )
             sys.exit()
-    elif fallback:
+    elif fallback and not config_found:
         sys.stderr.write((_("No %s found, cannot fall back. Exiting.") % file_name) + "\n")
         sys.exit()
 
