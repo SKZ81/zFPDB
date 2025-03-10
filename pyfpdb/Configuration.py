@@ -42,14 +42,24 @@ import locale
 import re
 import xml.dom.minidom
 from xml.dom.minidom import Node
-
+#
 import platform
+# if platform.system() == 'Windows':
+#     import winpaths
+#     winpaths_appdata = winpaths.get_appdata()
+# else:
+#     winpaths_appdata = False
+# import platform
+import os
+from pathlib import Path
+
 if platform.system() == 'Windows':
-    import winpaths
-    winpaths_appdata = winpaths.get_appdata()
+    # Get AppData path correctly using environment variables
+    winpaths_appdata = os.getenv('APPDATA', False)  # Returns path or False if not found
 else:
     winpaths_appdata = False
 
+print(f"AppData path: {winpaths_appdata}")
 import logging, logging.config
 
 # config version is used to flag a warning at runtime if the users config is

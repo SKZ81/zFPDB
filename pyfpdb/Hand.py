@@ -692,7 +692,7 @@ class Hand(object):
                 self.bets['BLINDSANTES'][player].append(sb)
                 self.pot.addCommonMoney(player, sb)
                 
-            street = 'BLAH' # excuse me ?
+            street = None
 
             if self.gametype['base'] == 'hold':
                 street = 'PREFLOP'
