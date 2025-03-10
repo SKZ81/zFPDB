@@ -39,7 +39,7 @@ exe = EXE(pyz,
           debug=False,
           strip=False,
           upx=True,
-          console=False,
+          console=True,
           icon="gfx/fpdb_large_icon.ico" if os_family == "Windows" else None)
 coll = COLLECT(exe,
                a.binaries,
