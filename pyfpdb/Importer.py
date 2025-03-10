@@ -206,10 +206,6 @@ class Importer:
         """Add a file or directory for bulk import"""
         #for windows platform, force os.walk variable to be unicode
         # see fpdb-main post 9th July 2011
-        if self.config.posix:
-            pass
-        else:
-            inputPath = unicode(inputPath)
 
         # TODO: only add sane files?
         if os.path.isdir(inputPath):

@@ -42,7 +42,8 @@ class InterProcessLockBase:
         self.heldBy = None
 
     def getHashedName(self):
-        return base64.b64encode(self.name).replace('=','')
+        # TODO : use md5 instead ? Not really "hashed" here...
+        return base64.b64encode(self.name.encode()).replace(b'=',b'')
 
     def acquire_impl(self, wait): abstract
         
@@ -120,7 +121,7 @@ class InterProcessLockWin32(InterProcessLockBase):
         self.mutex = None
             
     def acquire_impl(self,wait):
-        self.mutex = win32event.CreateMutex(None, 0, self.getHashedName())
+        self.mutex = win32event.CreateMutex(None, 0, self.getHashedName().decode())
         if win32api.GetLastError() == winerror.ERROR_ALREADY_EXISTS:
             self.mutex.Close()
             self.mutex = None
